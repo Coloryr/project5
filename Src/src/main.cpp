@@ -3,6 +3,7 @@
 
 void Taska(void *data)
 {
+    //循环闪烁
     for (;;)
     {
         digitalWrite(LED, HIGH);
@@ -14,9 +15,17 @@ void Taska(void *data)
 
 void setup()
 {
+    //设置引脚模式
     pinMode(LED, OUTPUT);
-    //堆太小会溢出
-    xTaskCreate(Taska, "TaskA", 8192, NULL, 2, NULL);
+    //创建任务
+    xTaskCreate(
+        Taska,   //任务
+        "TaskA", //任务名字
+        8192,    //堆大小，太小会溢出
+        NULL,    //参数
+        2,       //优先级
+        NULL     //控制指针
+    );
 }
 
 void loop()
