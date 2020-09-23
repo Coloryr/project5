@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <pin.h>
+#include <esp_spi_flash.h>
 
 //任务A
 void Taska(void *data)
