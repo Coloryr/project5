@@ -1,14 +1,19 @@
 #include <Arduino.h>
 #include <pin.h>
 
+//任务A
 void Taska(void *data)
 {
     //循环闪烁
     for (;;)
     {
+        //写IO口为高
         digitalWrite(LED, HIGH);
+        //延迟
         delay(500);
+        //写IO口为低
         digitalWrite(LED, LOW);
+        //延迟
         delay(500);
     }
 }
