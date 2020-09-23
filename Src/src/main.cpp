@@ -3,26 +3,22 @@
 
 void Taska(void *data)
 {
-    portTickType xLastWakeTime;
-    xLastWakeTime = xTaskGetTickCount();
     for (;;)
     {
         digitalWrite(LED, HIGH);
-        vTaskDelayUntil(&xLastWakeTime, (100 / portTICK_RATE_MS));
+        delay(500);
         digitalWrite(LED, LOW);
-        vTaskDelayUntil(&xLastWakeTime, (100 / portTICK_RATE_MS));
+        delay(500);
     }
 }
 
 void setup()
 {
-    xTaskCreate(Taska, "TaskA", 80, NULL, 2, NULL);
-    vTaskStartScheduler();
+    pinMode(LED, OUTPUT);
+    //堆太小会溢出
+    xTaskCreate(Taska, "TaskA", 8192, NULL, 2, NULL);
 }
 
 void loop()
 {
-    for (;;)
-    {
-    }
 }

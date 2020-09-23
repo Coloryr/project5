@@ -3,6 +3,6 @@
 
 #include <Arduino.h>
 
-#define LED 1
+#define LED 2
 
 #endif
