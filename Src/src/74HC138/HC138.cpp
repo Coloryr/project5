@@ -27,7 +27,7 @@ void HC138::SetPin()
 
 void HC138::SetEnable(bool enable)
 {
-    digitalWrite(AEN, enable);
+    digitalWrite(AEN, enable ? LOW : HIGH);
 }
 
 void HC138::AddPos()
