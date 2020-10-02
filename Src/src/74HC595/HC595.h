@@ -19,13 +19,14 @@
 #define M1BLU 9
 #define M2BLU 10
 #define M3BLU 11
-#define M4BLU 6
+#define M4BLU 15
 
 class HC595
 {
 private:
 public:
     HC595();
+    void Init();
     void Reset();
     void SetOut(bool out);
     void SetRData(uint8_t *data1, uint8_t *data2, uint8_t *data3, uint8_t *data4, uint16_t size);

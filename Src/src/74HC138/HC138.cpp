@@ -5,6 +5,10 @@ class HC138 HC138;
 
 HC138::HC138()
 {
+}
+
+void HC138::Init()
+{
     pinMode(A0, OUTPUT);
     pinMode(A1, OUTPUT);
     pinMode(A2, OUTPUT);

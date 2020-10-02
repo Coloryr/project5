@@ -5,6 +5,10 @@ class HC595 HC595;
 
 HC595::HC595()
 {
+}
+
+void HC595::Init()
+{
     pinMode(MRES, OUTPUT);
     pinMode(MRCLK, OUTPUT);
     pinMode(MRLOCK, OUTPUT);

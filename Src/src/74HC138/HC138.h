@@ -15,6 +15,7 @@ private:
     void SetPin();
 public:
     HC138();
+    void Init();
     void SetEnable(bool enable);
     void AddPos();
     void SetPos(uint8_t pos);

@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <pin.h>
+#include <74HC138/HC138.h>
+#include <74HC595/HC595.h>
 #include <esp_spi_flash.h>
 
 //任务A
@@ -21,6 +23,8 @@ void Taska(void *data)
 
 void setup()
 {
+    HC138.Init();
+    HC595.Init();
     //设置引脚模式
     pinMode(LED, OUTPUT);
     //创建任务
