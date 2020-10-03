@@ -13,11 +13,11 @@ void Taska(void *data)
         //写IO口为高
         digitalWrite(LED, HIGH);
         //延迟
-        delay(500);
+        delay(300);
         //写IO口为低
         digitalWrite(LED, LOW);
         //延迟
-        delay(500);
+        delay(300);
     }
 }
 
