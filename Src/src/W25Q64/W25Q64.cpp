@@ -1,229 +1,142 @@
 #include <Arduino.h>
 #include <W25q64\W25Q64.h>
+#include <esp_spi_flash.h>
 
-static uint8_t cspin = 22;
-static SPIClass *mpSPI = &SPI;
-static SPISettings mSPISettings;
+class W25Q64 W25Q64;
 
-// SPIポートの設定
-void W25Q64_setSPIPort(SPIClass &rSPI)
+void W25Q64::W25Q64_begin(uint32_t frq)
 {
-    mpSPI = &rSPI;
-}
-
-//
-// フラッシュメモリ W25Q64の利用開始
-//
-void W25Q64_begin(uint32_t frq)
-{
-    pinMode(cspin, OUTPUT);
+    pinMode(SS1, OUTPUT);
+    mpSPI = SPIClass(VSPI);
+    mpSPI.begin(18, 19, 23, 5);
+    // mpSPI.setHwCs(true);
     W25Q64_deselect();
     mSPISettings = SPISettings(frq, MSBFIRST, SPI_MODE0);
-    mpSPI->begin();
 }
 
-//
-// フラッシュメモリ W25Q64の利用終了
-//
-void W25Q64_end()
+void W25Q64::W25Q64_end()
 {
     W25Q64_powerDown();
     W25Q64_deselect();
-    mpSPI->end();
+    mpSPI.end();
 }
 
-//
-// チップセレクト
-// フラッシュメモリ操作を選択にする
-//
-void W25Q64_select()
+void W25Q64::W25Q64_select()
 {
-    mpSPI->beginTransaction(mSPISettings);
-    digitalWrite(cspin, LOW);
+    mpSPI.beginTransaction(mSPISettings);
+    digitalWrite(SS1, LOW);
 }
 
-//
-// チップディセレクト
-// フラッシュメモリ操作を有非選択にする
-//
-void W25Q64_deselect()
+void W25Q64::W25Q64_deselect()
 {
-    digitalWrite(cspin, HIGH);
-    mpSPI->endTransaction();
+    digitalWrite(SS1, HIGH);
+    mpSPI.endTransaction();
 }
 
-//
-// ステータスレジスタ1の値取得
-// 戻り値: ステータスレジスタ1の値
-//
-byte W25Q64_readStatusReg1()
+byte W25Q64::W25Q64_readStatusReg1()
 {
     byte rc;
     W25Q64_select();
-    mpSPI->transfer(CMD_READ_STATUS_R1);
-    rc = mpSPI->transfer(0xFF);
+    mpSPI.transfer(CMD_READ_STATUS_R1);
+    rc = mpSPI.transfer(0xFF);
     W25Q64_deselect();
     return rc;
 }
 
-//
-// ステータスレジスタ2の値取得
-// 戻り値: ステータスレジスタ2の値
-//
-byte W25Q64_readStatusReg2()
+byte W25Q64::W25Q64_readStatusReg2()
 {
     byte rc;
     W25Q64_select();
-    mpSPI->transfer(CMD_READ_STATUS_R2);
-    rc = mpSPI->transfer(0xFF);
+    mpSPI.transfer(CMD_READ_STATUS_R2);
+    rc = mpSPI.transfer(0xFF);
     W25Q64_deselect();
     return rc;
 }
 
-//
-// JEDEC ID(Manufacture, Memory Type,Capacity)の取得
-// d(out) :Manufacture, Memory Type,Capacityの３バイトを格納する
-//
-void W25Q64_readManufacturer(byte *d)
+void W25Q64::W25Q64_readUniqieID()
 {
     W25Q64_select();
-    mpSPI->transfer(CMD_JEDEC_ID);
-    for (byte i = 0; i < 3; i++)
-    {
-        d[i] = mpSPI->transfer(0x00);
-    }
+    mpSPI.transfer(CMD_MANUFACURER_ID);
+    mpSPI.transfer(0x00);
+    mpSPI.transfer(0x00);
+    mpSPI.transfer(0x00);
+    W25QXX_TYPE |= mpSPI.transfer(0xFF) << 8;
+    W25QXX_TYPE |= mpSPI.transfer(0xFF);
     W25Q64_deselect();
 }
 
-//
-// Unique IDの取得
-// d(out): Unique ID 8バイトを返す
-//
-void W25Q64_readUniqieID(byte *d)
-{
-    W25Q64_select();
-    mpSPI->transfer(CMD_READ_UNIQUE_ID);
-    mpSPI->transfer(0x00);
-    mpSPI->transfer(0x00);
-    mpSPI->transfer(0x00);
-    mpSPI->transfer(0x00);
-    for (byte i = 0; i < 8; i++)
-    {
-        d[i] = mpSPI->transfer(0x00);
-    }
-    W25Q64_deselect();
-}
-
-//
-// 書込み等の処理中チェック
-// 戻り値: true:作業 、false:アイドル中
-//
-boolean W25Q64_IsBusy()
+//等待空闲
+boolean W25Q64::W25Q64_IsBusy()
 {
     uint8_t r1;
     W25Q64_select();
-    mpSPI->transfer(CMD_READ_STATUS_R1);
-    r1 = mpSPI->transfer(0xff);
+    mpSPI.transfer(CMD_READ_STATUS_R1);
+    r1 = mpSPI.transfer(0xff);
     W25Q64_deselect();
     if (r1 & SR1_BUSY_MASK)
         return true;
     return false;
 }
 
-//
-//　パワーダウン指定
-//
-void W25Q64_powerDown()
+void W25Q64::W25Q64_powerDown()
 {
     W25Q64_select();
-    mpSPI->transfer(CMD_POWER_DOWN);
+    mpSPI.transfer(CMD_POWER_DOWN);
     W25Q64_deselect();
 }
 
-//
-// 書込み許可設定
-//
-void W25Q64_WriteEnable()
+void W25Q64::W25Q64_WriteEnable()
 {
     W25Q64_select();
-    mpSPI->transfer(CMD_WRIRE_ENABLE);
+    mpSPI.transfer(CMD_WRIRE_ENABLE);
     W25Q64_deselect();
 }
 
-//
-// 書込み禁止設定
-//
-void W25Q64_WriteDisable()
+void W25Q64::W25Q64_WriteDisable()
 {
     W25Q64_select();
-    mpSPI->transfer(CMD_WRITE_DISABLE);
+    mpSPI.transfer(CMD_WRITE_DISABLE);
     W25Q64_deselect();
 }
 
-//
-// データの読み込み
-// addr(in): 読込開始アドレス (24ビット 0x00000 - 0xFFFFF)
-// n(in):読込データ数
-//
-uint16_t W25Q64_read(uint32_t addr, uint8_t *buf, uint16_t n)
+//读取SPI FLASH
+//在指定地址开始读取指定长度的数据
+//buf:数据存储区
+//addr:开始读取的地址(24bit)
+//NumByteToRead:要读取的字节数(最大65535)
+uint16_t W25Q64::W25Q64_read(uint32_t addr, uint8_t *buf, uint16_t NumByteToRead)
 {
     W25Q64_select();
-    mpSPI->transfer(CMD_READ_DATA);
-    mpSPI->transfer(addr >> 16);         // A23-A16
-    mpSPI->transfer((addr >> 8) & 0xFF); // A15-A08
-    mpSPI->transfer(addr & 0xFF);        // A07-A00
+    mpSPI.transfer(CMD_READ_DATA);
+    mpSPI.transfer(addr >> 16);         // A23-A16
+    mpSPI.transfer((addr >> 8) & 0xFF); // A15-A08
+    mpSPI.transfer(addr & 0xFF);        // A07-A00
 
     uint16_t i;
-    for (i = 0; i < n; i++)
+    for (i = 0; i < NumByteToRead; i++)
     {
-        buf[i] = mpSPI->transfer(0x00);
+        buf[i] = mpSPI.transfer(0xFF);
     }
 
     W25Q64_deselect();
     return i;
 }
 
-//
-// 高速データの読み込み
-// addr(in): 読込開始アドレス (24ビット 0x00000 - 0xFFFFF)
-// n(in):読込データ数
-//
-uint16_t W25Q64_fastread(uint32_t addr, uint8_t *buf, uint16_t n)
-{
-    W25Q64_select();
-    mpSPI->transfer(CMD_FAST_READ);
-    mpSPI->transfer(addr >> 16);         // A23-A16
-    mpSPI->transfer((addr >> 8) & 0xFF); // A15-A08
-    mpSPI->transfer(addr & 0xFF);        // A07-A00
-    mpSPI->transfer(0x00);               // ダミー
-
-    uint16_t i;
-    for (i = 0; i < n; i++)
-        buf[i] = mpSPI->transfer(0x00);
-
-    W25Q64_deselect();
-    return i;
-}
-
-//
-// セクタ単位消去(4kb空間単位でデータの消去を行う)
-// sect_no(in) セクタ番号(0 - 2048)
-// flgwait(in) true:処理待ちを行う false:待ち無し
-// 戻り値: true:正常終了 false:失敗
-//  補足： データシートでは消去に通常 30ms 、最大400msかかると記載されている
-//         アドレス23ビットのうち上位 11ビットがセクタ番号の相当する。下位12ビットはセクタ内アドレスとなる。
-//
-boolean W25Q64_eraseSector(uint16_t sect_no, boolean flgwait)
+//擦除一个扇区
+//sect_no:扇区地址 根据实际容量设置
+//flgwait:是否等待
+//擦除一个扇区的最少时间:150ms
+boolean W25Q64::W25Q64_eraseSector(uint16_t sect_no, boolean flgwait)
 {
     uint32_t addr = sect_no;
     addr <<= 12;
 
     W25Q64_WriteEnable();
     W25Q64_select();
-    mpSPI->transfer(CMD_SECTOR_ERASE);
-    mpSPI->transfer((addr >> 16) & 0xff);
-    mpSPI->transfer((addr >> 8) & 0xff);
-    mpSPI->transfer(addr & 0xff);
+    mpSPI.transfer(CMD_SECTOR_ERASE);
+    mpSPI.transfer((addr >> 16) & 0xff);
+    mpSPI.transfer((addr >> 8) & 0xff);
+    mpSPI.transfer(addr & 0xff);
     W25Q64_deselect();
 
     // 処理待ち
@@ -235,78 +148,14 @@ boolean W25Q64_eraseSector(uint16_t sect_no, boolean flgwait)
     return true;
 }
 
-//
-// 64KBブロック単位消去(64kb空間単位でデータの消去を行う)
-// blk_no(in) ブロック番号(0 - 127)
-// flgwait(in) true:処理待ちを行う false:待ち無し
-// 戻り値: true:正常終了 false:失敗
-//   補足: データシートでは消去に通常 150ms 、最大1000msかかると記載されている
-//         アドレス23ビットのうち上位 7ビットがブロックの相当する。下位16ビットはブロック内アドレスとなる。
-//
-boolean W25Q64_erase64Block(uint16_t blk_no, boolean flgwait)
-{
-    uint32_t addr = blk_no;
-    addr <<= 16;
-
-    W25Q64_WriteEnable();
-    W25Q64_select();
-    mpSPI->transfer(CMD_BLOCK_ERASE64KB);
-    mpSPI->transfer((addr >> 16) & 0xff);
-    mpSPI->transfer((addr >> 8) & 0xff);
-    mpSPI->transfer(addr & 0xff);
-    W25Q64_deselect();
-
-    // 処理待ち
-    while (W25Q64_IsBusy() & flgwait)
-    {
-        delay(50);
-    }
-
-    return true;
-}
-
-//
-// 32KBブロック単位消去(32kb空間単位でデータの消去を行う)
-// blk_no(in) ブロック番号(0 - 255)
-// flgwait(in) true:処理待ちを行う false:待ち無し
-// 戻り値: true:正常終了 false:失敗
-//   補足: データシートでは消去に通常 120ms 、最大800msかかると記載されている
-//         アドレス23ビットのうち上位 8ビットがブロックの相当する。下位15ビットはブロック内アドレスとなる。
-//
-boolean W25Q64_erase32Block(uint16_t blk_no, boolean flgwait)
-{
-
-    uint32_t addr = blk_no;
-    addr <<= 15;
-
-    W25Q64_WriteEnable();
-    W25Q64_select();
-    mpSPI->transfer(CMD_BLOCK_ERASE32KB);
-    mpSPI->transfer((addr >> 16) & 0xff);
-    mpSPI->transfer((addr >> 8) & 0xff);
-    mpSPI->transfer(addr & 0xff);
-    W25Q64_deselect();
-
-    // 処理待ち
-    while (W25Q64_IsBusy() & flgwait)
-    {
-        delay(50);
-    }
-
-    return true;
-}
-
-//
-// 全領域の消去
-// flgwait(in) true:処理待ちを行う false:待ち無し
-// 戻り値: true:正常終了 false:失敗
-//   補足: データシートでは消去に通常 15s 、最大30sかかると記載されている
-//
-boolean W25Q64_eraseAll(boolean flgwait)
+//擦除整个芯片
+//flgwait:是否等待
+//等待时间超长...
+boolean W25Q64::W25Q64_eraseAll(boolean flgwait)
 {
     W25Q64_WriteEnable();
     W25Q64_select();
-    mpSPI->transfer(CMD_CHIP_ERASE);
+    mpSPI.transfer(CMD_CHIP_ERASE);
     W25Q64_deselect();
 
     // 処理待ち
@@ -319,41 +168,115 @@ boolean W25Q64_eraseAll(boolean flgwait)
     return true;
 }
 
-//
-// データの書き込み
-// sect_no(in) : セクタ番号(0x00 - 0x7FF)
-// inaddr(in)  : セクタ内アドレス(0x00-0xFFF)
-// data(in)    : 書込みデータ格納アドレス
-// n(in)       : 書込みバイト数(0～256)
-//
-uint16_t W25Q64_pageWrite(uint16_t sect_no, uint16_t inaddr, byte *data, uint16_t n)
+//SPI在一页(0~65535)内写入少于256个字节的数据
+//在指定地址开始写入最大256字节的数据
+//pBuffer:数据存储区
+//WriteAddr:开始写入的地址(24bit)
+//NumByteToWrite:要写入的字节数(最大256),该数不应该超过该页的剩余字节数!!!
+uint16_t W25Q64::W25Q64_pageWrite(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
 {
-
-    uint32_t addr = sect_no;
     uint16_t i;
-    addr <<= 12;
-    addr += inaddr;
-
     W25Q64_WriteEnable();
-
-    if (W25Q64_IsBusy())
+    while (W25Q64_IsBusy())
     {
-        return 0;
+        delay(10);
     }
 
     W25Q64_select();
-    mpSPI->transfer(CMD_PAGE_PROGRAM);
-    mpSPI->transfer((addr >> 16) & 0xff);
-    mpSPI->transfer((addr >> 8) & 0xff);
-    mpSPI->transfer(addr & 0xff);
+    mpSPI.transfer(CMD_PAGE_PROGRAM);
+    mpSPI.transfer((WriteAddr >> 16) & 0xff);
+    mpSPI.transfer((WriteAddr >> 8) & 0xff);
+    mpSPI.transfer(WriteAddr & 0xff);
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i < NumByteToWrite; i++)
     {
-        mpSPI->transfer(data[i]);
+        mpSPI.transfer(pBuffer[i]);
     }
     W25Q64_deselect();
     while (W25Q64_IsBusy())
-        ;
-
+    {
+        delay(10);
+    }
     return i;
+}
+
+void W25Q64::W25Q64_write_nocheck(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
+{
+    uint16_t pageremain;
+    pageremain = 256 - WriteAddr % 256; //单页剩余的字节数
+    if (NumByteToWrite <= pageremain)
+        pageremain = NumByteToWrite; //不大于256个字节
+    while (1)
+    {
+        W25Q64_pageWrite(pBuffer, WriteAddr, pageremain);
+        if (NumByteToWrite == pageremain)
+            break; //写入结束了
+        else       //NumByteToWrite>pageremain
+        {
+            pBuffer += pageremain;
+            WriteAddr += pageremain;
+
+            NumByteToWrite -= pageremain; //减去已经写入了的字节数
+            if (NumByteToWrite > 256)
+                pageremain = 256; //一次可以写入256个字节
+            else
+                pageremain = NumByteToWrite; //不够256个字节了
+        }
+    };
+}
+
+//写SPI FLASH
+//在指定地址开始写入指定长度的数据
+//该函数带擦除操作!
+//pBuffer:数据存储区
+//WriteAddr:开始写入的地址(24bit)
+//NumByteToWrite:要写入的字节数(最大65535)
+uint16_t W25Q64::W25Q64_Write(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
+{
+    uint32_t secpos;
+    uint16_t secoff;
+    uint16_t secremain;
+    uint16_t i;
+    uint8_t *W25QXX_BUF;
+    W25QXX_BUF = W25QXX_BUFFER;
+    secpos = WriteAddr / 4096; //扇区地址
+    secoff = WriteAddr % 4096; //在扇区内的偏移
+    secremain = 4096 - secoff; //扇区剩余空间大小
+    if (NumByteToWrite <= secremain)
+        secremain = NumByteToWrite; //不大于4096个字节
+    while (1)
+    {
+        W25Q64_read(secpos * 4096, W25QXX_BUF, 4096); //读出整个扇区的内容
+        for (i = 0; i < secremain; i++)               //校验数据
+        {
+            if (W25QXX_BUF[secoff + i] != 0XFF)
+                break; //需要擦除
+        }
+        if (i < secremain) //需要擦除
+        {
+            W25Q64_eraseSector(secpos, true); //擦除这个扇区
+            for (i = 0; i < secremain; i++)   //复制
+            {
+                W25QXX_BUF[i + secoff] = pBuffer[i];
+            }
+            W25Q64_write_nocheck(W25QXX_BUF, secpos * 4096, 4096); //写入整个扇区
+        }
+        else
+            W25Q64_write_nocheck(pBuffer, WriteAddr, secremain); //写已经擦除了的,直接写入扇区剩余区间.
+        if (NumByteToWrite == secremain)
+            break; //写入结束了
+        else       //写入未结束
+        {
+            secpos++;   //扇区地址增1
+            secoff = 0; //偏移位置为0
+
+            pBuffer += secremain;        //指针偏移
+            WriteAddr += secremain;      //写地址偏移
+            NumByteToWrite -= secremain; //字节数递减
+            if (NumByteToWrite > 4096)
+                secremain = 4096; //下一个扇区还是写不完
+            else
+                secremain = NumByteToWrite; //下一个扇区可以写完了
+        }
+    };
 }
