@@ -107,32 +107,32 @@ namespace NFApp1
                 MRLOCK.Write(GpioPinValue.Low);
             }
         }
-        public void SetBDate(byte[] data1, byte[] data2, byte[] data3, byte[] data4, int size)
+        public void SetBDate(byte[,] data1, int size, int j)
         {
             byte i;
             int local;
             byte data_1;
-            byte data_2;
-            byte data_3;
-            byte data_4;
+            //byte data_2;
+            //byte data_3;
+            //byte data_4;
 
             for (local = 0; local < size; local++)
             {
-                data_1 = data1[local];
-                data_2 = data2[local];
-                data_3 = data3[local];
-                data_4 = data4[local];
+                data_1 = data1[j, local];
+                //data_2 = data2[j, local];
+                //data_3 = data3[j, local];
+                //data_4 = data4[j, local];
                 for (i = 0; i < 8; i++)
                 {
                     M1BLU.Write((data_1 & 0x01) == 1 ? GpioPinValue.High : GpioPinValue.Low);
-                    M2BLU.Write((data_2 & 0x01) == 1 ? GpioPinValue.High : GpioPinValue.Low);
-                    M3BLU.Write((data_3 & 0x01) == 1 ? GpioPinValue.High : GpioPinValue.Low);
-                    M4BLU.Write((data_4 & 0x01) == 1 ? GpioPinValue.High : GpioPinValue.Low);
+                    //M2BLU.Write((data_2 & 0x01) == 1 ? GpioPinValue.High : GpioPinValue.Low);
+                    //M3BLU.Write((data_3 & 0x01) == 1 ? GpioPinValue.High : GpioPinValue.Low);
+                    //M4BLU.Write((data_4 & 0x01) == 1 ? GpioPinValue.High : GpioPinValue.Low);
 
                     data_1 <<= 1;
-                    data_2 <<= 1;
-                    data_3 <<= 1;
-                    data_4 <<= 1;
+                    //data_2 <<= 1;
+                    //data_3 <<= 1;
+                    //data_4 <<= 1;
 
                     MBCLK.Write(GpioPinValue.Low);
                     Thread.Sleep(TimeSpan.FromMilliseconds(10));
