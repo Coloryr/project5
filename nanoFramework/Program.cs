@@ -23,6 +23,13 @@ namespace NFApp1
             data = id.ToString("X4");
             Debug.WriteLine("FLASH2:" + data);
 
+            FLASH.WriteEnable(FLASH.FLASHNum.FLASH1);
+            FLASH.PageWrite(FLASH.FLASHNum.FLASH1, new byte[] { 0x65 }, 0);
+            var temp = FLASH.Read(FLASH.FLASHNum.FLASH1, 0, 1);
+
+            data = temp[0].ToString("X2");
+            Debug.WriteLine("DATA:" + data);
+
             GpioPin dummyPad = GpioController.GetDefault().OpenPin(2);
             GpioPin key = GpioController.GetDefault().OpenPin(0);
             key.SetDriveMode(GpioPinDriveMode.Input);

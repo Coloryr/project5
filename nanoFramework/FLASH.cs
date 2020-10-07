@@ -138,7 +138,7 @@ namespace NFApp1
                 cs1.Write(GpioPinValue.High);
             else
                 cs2.Write(GpioPinValue.High);
-            if ((res[1] & Command.SR1_BUSY_MASK) >= 1)
+            if ((res[1] & Command.SR1_BUSY_MASK) == 0x01)
                 return true;
             return false;
         }
@@ -197,11 +197,12 @@ namespace NFApp1
         public void EraseSector(FLASHNum num, long addr, bool wait = true)
         {
             addr *= 4096;
-            WriteEnable(num);
+            
             while (IsBusy(num))
             {
                 Thread.Sleep(10);
             }
+            WriteEnable(num);
             var temp = new byte[] { Command.CMD_SECTOR_ERASE, (byte)(addr >> 16), (byte)(addr >> 8), (byte)addr };
             if (num == FLASHNum.FLASH1)
                 cs1.Write(GpioPinValue.Low);
@@ -216,7 +217,6 @@ namespace NFApp1
             {
                 Thread.Sleep(10);
             }
-            WriteDisable(num);
         }
         public void EraseAll(FLASHNum num, bool wait = true)
         {
@@ -239,16 +239,11 @@ namespace NFApp1
             {
                 Thread.Sleep(10);
             }
-            WriteDisable(num);
         }
         public void PageWrite(FLASHNum num, byte[] data, long addr)
         {
             WriteEnable(num);
-            while (IsBusy(num))
-            {
-                Thread.Sleep(10);
-            }
-            var temp = new byte[4] { Command.CMD_SECTOR_ERASE, (byte)(addr >> 16), (byte)(addr >> 8), (byte)addr };
+            var temp = new byte[4] { Command.CMD_PAGE_PROGRAM, (byte)(addr >> 16), (byte)(addr >> 8), (byte)addr };
             if (num == FLASHNum.FLASH1)
                 cs1.Write(GpioPinValue.Low);
             else
@@ -259,10 +254,6 @@ namespace NFApp1
                 cs1.Write(GpioPinValue.High);
             else
                 cs2.Write(GpioPinValue.High);
-            while (IsBusy(num))
-            {
-                Thread.Sleep(10);
-            }
             WriteDisable(num);
         }
         public void WriteNocheck(FLASHNum num, byte[] data, long addr)
