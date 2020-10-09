@@ -46,21 +46,11 @@ namespace NFApp1
     }
     class FLASH
     {
-        public enum FLASHNum
-        {
-            FLASH1, FLASH2
-        }
-
         private SpiDevice spi;
         private GpioPin cs1;
-        private GpioPin cs2;
         public FLASH()
         {
-            Configuration.SetPinFunction(18, DeviceFunction.SPI2_CLOCK);
-            Configuration.SetPinFunction(19, DeviceFunction.SPI2_MISO);
-            Configuration.SetPinFunction(23, DeviceFunction.SPI2_MOSI);
-
-            var connectionSettings = new SpiConnectionSettings(21)
+            var connectionSettings = new SpiConnectionSettings(12)
             {
                 DataBitLength = 8,
                 ClockFrequency = 10000000
@@ -70,193 +60,123 @@ namespace NFApp1
             cs1 = GpioController.GetDefault().OpenPin(5);
             cs1.SetDriveMode(GpioPinDriveMode.Output);
             cs1.Write(GpioPinValue.High);
-
-            cs2 = GpioController.GetDefault().OpenPin(17);
-            cs2.SetDriveMode(GpioPinDriveMode.Output);
-            cs2.Write(GpioPinValue.High);
         }
-        public int GetID(FLASHNum num)
+        public int GetID()
         {
             var data = new byte[4] { Command.CMD_MANUFACURER_ID, 0x00, 0x00, 0x00 };
             var res = new byte[2];
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.Write(data);
             spi.TransferFullDuplex(res, res);
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
+            cs1.Write(GpioPinValue.High);
             byte temp = res[1];
             res[1] = res[0];
             res[0] = temp;
             ushort test = BitConverter.ToUInt16(res, 0);
             return test;
         }
-        public byte ReadStatusReg1(FLASHNum num)
+        public byte ReadStatusReg1()
         {
             var data = new byte[2] { Command.CMD_READ_STATUS_R1, 0x00 };
             var res = new byte[2];
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.TransferFullDuplex(data, res);
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
+            cs1.Write(GpioPinValue.High);
             return res[1];
         }
-        public byte ReadStatusReg2(FLASHNum num)
+        public byte ReadStatusReg2()
         {
             var data = new byte[2] { Command.CMD_READ_STATUS_R2, 0x00 };
             var res = new byte[2];
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.TransferFullDuplex(data, res);
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
+            cs1.Write(GpioPinValue.High);
             return res[1];
         }
-        public bool IsBusy(FLASHNum num)
+        public bool IsBusy()
         {
             var data = new byte[2] { Command.CMD_READ_STATUS_R1, 0x00 };
             var res = new byte[2];
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.TransferFullDuplex(data, res);
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
+            cs1.Write(GpioPinValue.High);
             if ((res[1] & Command.SR1_BUSY_MASK) == 0x01)
                 return true;
             return false;
         }
-        public void PowerDown(FLASHNum num)
+        public void PowerDown()
         {
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.Write(new byte[] { Command.CMD_POWER_DOWN });
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
+            cs1.Write(GpioPinValue.High);
         }
-        public void WriteEnable(FLASHNum num)
+        public void WriteEnable()
         {
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.Write(new byte[] { Command.CMD_WRIRE_ENABLE });
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
+            cs1.Write(GpioPinValue.High);
         }
-        public void WriteDisable(FLASHNum num)
+        public void WriteDisable()
         {
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.Write(new byte[] { Command.CMD_WRITE_DISABLE });
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
+            cs1.Write(GpioPinValue.High);
         }
-        public byte[] Read(FLASHNum num, long addr, int NumByteToRead)
+        public byte[] Read(long addr, int NumByteToRead)
         {
             var temp = new byte[] { Command.CMD_READ_DATA, (byte)(addr >> 16), (byte)(addr >> 8), (byte)addr };
             var data = new byte[NumByteToRead];
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.Write(temp);
             spi.TransferFullDuplex(data, data);
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
+            cs1.Write(GpioPinValue.High);
             return data;
         }
-        public void EraseSector(FLASHNum num, long addr, bool wait = true)
+        public void EraseSector(long addr, bool wait = true)
         {
             addr *= 4096;
-            
-            while (IsBusy(num))
+
+            while (IsBusy())
             {
                 Thread.Sleep(10);
             }
-            WriteEnable(num);
+            WriteEnable();
             var temp = new byte[] { Command.CMD_SECTOR_ERASE, (byte)(addr >> 16), (byte)(addr >> 8), (byte)addr };
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.Write(temp);
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
-            while (IsBusy(num) && wait)
+            cs1.Write(GpioPinValue.High);
+            while (IsBusy() && wait)
             {
                 Thread.Sleep(10);
             }
         }
-        public void EraseAll(FLASHNum num, bool wait = true)
+        public void EraseAll(bool wait = true)
         {
-            WriteEnable(num);
-            while (IsBusy(num))
+            WriteEnable();
+            while (IsBusy())
             {
                 Thread.Sleep(10);
             }
             var temp = new byte[] { Command.CMD_CHIP_ERASE };
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.Write(temp);
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
-            while (IsBusy(num) && wait)
+            cs1.Write(GpioPinValue.High);
+            while (IsBusy() && wait)
             {
                 Thread.Sleep(10);
             }
         }
-        public void PageWrite(FLASHNum num, byte[] data, long addr)
+        public void PageWrite(byte[] data, long addr)
         {
-            WriteEnable(num);
+            WriteEnable();
             var temp = new byte[4] { Command.CMD_PAGE_PROGRAM, (byte)(addr >> 16), (byte)(addr >> 8), (byte)addr };
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.Low);
-            else
-                cs2.Write(GpioPinValue.Low);
+            cs1.Write(GpioPinValue.Low);
             spi.Write(temp);
             spi.Write(data);
-            if (num == FLASHNum.FLASH1)
-                cs1.Write(GpioPinValue.High);
-            else
-                cs2.Write(GpioPinValue.High);
-            WriteDisable(num);
+            cs1.Write(GpioPinValue.High);
+            WriteDisable();
         }
-        public void WriteNocheck(FLASHNum num, byte[] data, long addr)
+        public void WriteNocheck(byte[] data, long addr)
         {
             int pageremain;
             int NumByteToWrite = data.Length;
@@ -264,14 +184,14 @@ namespace NFApp1
             pageremain = (int)(256 - addr % 256); //单页剩余的字节数
             if (NumByteToWrite <= pageremain)
             {
-                PageWrite(num, data, addr);
+                PageWrite(data, addr);
                 return;
             }
             while (true)
             {
                 var temp = new byte[pageremain];
                 Array.Copy(data, now, temp, 0, pageremain);
-                PageWrite(num, temp, addr);
+                PageWrite(temp, addr);
                 if (NumByteToWrite == pageremain)
                     break; //写入结束了
                 else       //NumByteToWrite>pageremain
@@ -286,7 +206,7 @@ namespace NFApp1
                 }
             };
         }
-        public void Write(FLASHNum num, byte[] data, long WriteAddr)
+        public void Write(byte[] data, long WriteAddr)
         {
             long secpos;
             int NumByteToWrite = data.Length;
@@ -302,7 +222,7 @@ namespace NFApp1
                 secremain = NumByteToWrite; //不大于4096个字节
             while (true)
             {
-                W25QXX_BUF = Read(num, secpos * 4096, 4096); //读出整个扇区的内容
+                W25QXX_BUF = Read(secpos * 4096, 4096); //读出整个扇区的内容
                 for (i = 0; i < secremain; i++)               //校验数据
                 {
                     if (W25QXX_BUF[secoff + i] != 0XFF)
@@ -310,15 +230,15 @@ namespace NFApp1
                 }
                 if (i < secremain) //需要擦除
                 {
-                    EraseSector(num, secpos, true); //擦除这个扇区
+                    EraseSector(secpos, true); //擦除这个扇区
                     Array.Copy(data, now, W25QXX_BUF, 0, secremain);
-                    WriteNocheck(num, W25QXX_BUF, secpos * 4096); //写入整个扇区
+                    WriteNocheck(W25QXX_BUF, secpos * 4096); //写入整个扇区
                 }
                 else
                 {
                     W25QXX_BUF = new byte[secremain];
                     Array.Copy(data, now, W25QXX_BUF, 0, secremain);
-                    WriteNocheck(num, W25QXX_BUF, WriteAddr); //写已经擦除了的,直接写入扇区剩余区间.
+                    WriteNocheck(W25QXX_BUF, WriteAddr); //写已经擦除了的,直接写入扇区剩余区间.
                 }
                 if (NumByteToWrite == secremain)
                     break; //写入结束了
