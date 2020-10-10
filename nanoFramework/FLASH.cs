@@ -44,16 +44,22 @@ namespace NFApp1
         public const byte SR1_BUSY_MASK = 0x01;
         public const byte SR1_WEN_MASK = 0x02;
     }
-    class FLASH
+    public class FLASH
     {
         private SpiDevice spi;
         private GpioPin cs1;
         public FLASH()
         {
-            var connectionSettings = new SpiConnectionSettings(12)
+            Configuration.SetPinFunction(18, DeviceFunction.SPI2_CLOCK);
+            Configuration.SetPinFunction(19, DeviceFunction.SPI2_MISO);
+            Configuration.SetPinFunction(23, DeviceFunction.SPI2_MOSI);
+
+            var connectionSettings = new SpiConnectionSettings(-1)
             {
                 DataBitLength = 8,
-                ClockFrequency = 10000000
+                ClockFrequency = 10000000,
+                SharingMode = SpiSharingMode.Shared,
+                ChipSelectLine = 0
             };
             spi = SpiDevice.FromId("SPI2", connectionSettings);
 

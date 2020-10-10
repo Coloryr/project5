@@ -2,7 +2,7 @@
 
 namespace NFApp1
 {
-    class HC138
+    public class HC138
     {
         private GpioPin A0;
         private GpioPin A1;
