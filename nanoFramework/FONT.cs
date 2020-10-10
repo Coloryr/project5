@@ -74,7 +74,7 @@ namespace NFApp1
             }
             else
             {
-                uint now = 0;
+                uint now = 0;//偏移
                 var temp = new byte[4096];
                 for (; ; )
                 {
@@ -83,13 +83,13 @@ namespace NFApp1
                         uint size = now - buffer.UnconsumedBufferLength;
                         temp = new byte[size];
                         buffer.ReadBytes(temp);
-                        Program.FLASH.Write(temp, now - 4096);
+                        Program.FLASH.Write(temp, Addr + now - 4096);
                         break;
                     }
                     else
                     {
                         buffer.ReadBytes(temp);
-                        Program.FLASH.Write(temp, now);
+                        Program.FLASH.Write(temp, Addr + now);
                     }
                     now += 4096;
                 }
