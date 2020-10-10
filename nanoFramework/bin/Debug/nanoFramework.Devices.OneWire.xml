@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>nanoFramework.Devices.OneWire</name>
+    </assembly>
+    <members>
+        <member name="T:nanoFramework.Devices.OneWire.OneWireController">
+            <summary>
+            Represents a 1-Wire bus controller. The class provides methods and properties that an app can use to interact with the bus.
+            </summary>
+        </member>
+        <member name="M:nanoFramework.Devices.OneWire.OneWireController.TouchReset">
+            <summary>
+            Reset all of the devices on the 1-Wire Net and return the result.
+            </summary>
+            <returns>
+            TRUE: presence pulse(s) detected, device(s) reset.
+            FALSE: no presence pulses detected.
+            </returns>
+        </member>
+        <member name="M:nanoFramework.Devices.OneWire.OneWireController.TouchBit(System.Boolean)">
+            <summary>
+            Send 1 bit of communication to the 1-Wire Net and return the result 1 bit read from the 1-Wire Net.  
+            The parameter <paramref name="value"/> least significant bit is used and the least significant bit of the result is the return bit.
+            </summary>
+            <param name="value">The least significant bit is the bit to send.</param>
+            <returns>
+            A 0 or 1 read from <paramref name="value"/>.
+            </returns>
+        </member>
+        <member name="M:nanoFramework.Devices.OneWire.OneWireController.TouchByte(System.Byte)">
+            <summary>
+            Send 8 bits of communication to the 1-Wire Net and return the
+            result 8 bits read from the 1-Wire Net. The <paramref name="value"/>
+            least significant 8 bits are used and the least significant 8 bits
+            of the result is the return byte.
+            </summary>
+            <param name="value">8 bits to send (least significant byte).</param>
+            <returns>
+            8 bits read from  <paramref name="value"/>
+            </returns>
+        </member>
+        <member name="M:nanoFramework.Devices.OneWire.OneWireController.WriteByte(System.Byte)">
+            <summary>
+            Send 8 bits of communication to the 1-Wire Net and verify that the
+            8 bits read from the 1-Wire Net is the same (write operation).
+            </summary>
+            <param name="value">8 bits to send (least significant byte).</param>
+            <returns>
+            TRUE: bytes written and echo was the same
+            FALSE: echo was not the same
+            </returns>
+        </member>
+        <member name="M:nanoFramework.Devices.OneWire.OneWireController.ReadByte">
+            <summary>
+            Sends 8 bits of read communication to the 1-Wire Net.
+            </summary>
+            <returns>
+            8 bit read from 1-Wire Net.
+            </returns>
+        </member>
+        <member name="M:nanoFramework.Devices.OneWire.OneWireController.FindFirstDevice(System.Boolean,System.Boolean)">
+            <summary>
+            Finds the first device on the 1-Wire Net
+            </summary>
+            <param name="performResetBeforeSearch">TRUE perform reset before search, FALSE do not perform reset before search.</param>
+            <param name="searchWithAlarmCommand">TRUE the find alarm command 0xEC is sent instead of the normal search command 0xF0.</param>
+            <returns>
+            TRUE: when a 1-Wire device was found and it's Serial Number placed in <see cref="P:nanoFramework.Devices.OneWire.OneWireController.SerialNumber"/>.
+            FALSE: There are no devices on the 1-Wire Net.
+            </returns>
+        </member>
+        <member name="M:nanoFramework.Devices.OneWire.OneWireController.FindNextDevice(System.Boolean,System.Boolean)">
+            <summary>
+             The function does a general search. This function continues from the previous search state. 
+             The search state can be reset by using the 'FindFirstDevice' function.
+            </summary>
+            <param name="performResetBeforeSearch">TRUE perform reset before search, FALSE do not perform reset before search.</param>
+            <param name="searchWithAlarmCommand">TRUE the find alarm command 0xEC is sent instead of the normal search command 0xF0.</param>
+            <returns>
+            TRUE: when a 1-Wire device was found and it's Serial Number placed in <see cref="P:nanoFramework.Devices.OneWire.OneWireController.SerialNumber"/>.
+            FALSE: when no new device was found. Either the last search was the last device or there are no devices on the 1-Wire Net.
+            </returns>
+        </member>
+        <member name="P:nanoFramework.Devices.OneWire.OneWireController.SerialNumber">
+            <summary>
+            SerialNum buffer that is used in the search methods <see cref="M:nanoFramework.Devices.OneWire.OneWireController.FindFirstDevice(System.Boolean,System.Boolean)"/> and <see cref="M:nanoFramework.Devices.OneWire.OneWireController.FindNextDevice(System.Boolean,System.Boolean)"/>.
+            </summary>
+            <returns>
+            </returns>
+        </member>
+        <member name="M:nanoFramework.Devices.OneWire.OneWireController.FindAllDevices">
+            <summary>
+            Find all devices present in 1-Wire Net
+            </summary>
+            <returns>
+            ArrayList with the serial numbers of all devices found.
+            </returns>
+        </member>
+    </members>
+</doc>
