@@ -54,12 +54,11 @@ namespace NFApp1
             Configuration.SetPinFunction(19, DeviceFunction.SPI2_MISO);
             Configuration.SetPinFunction(23, DeviceFunction.SPI2_MOSI);
 
-            var connectionSettings = new SpiConnectionSettings(-1)
+            var connectionSettings = new SpiConnectionSettings(12)
             {
                 DataBitLength = 8,
                 ClockFrequency = 10000000,
-                SharingMode = SpiSharingMode.Shared,
-                ChipSelectLine = 0
+                SharingMode = SpiSharingMode.Shared
             };
             spi = SpiDevice.FromId("SPI2", connectionSettings);
 

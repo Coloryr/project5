@@ -32,7 +32,7 @@ namespace NFApp1
         public void Create(StorageFile save)
         {
             int add = 0;
-            var list = Program.FileSystem.externalDevices.GetFolder("D:\\FONT").GetFolders();
+            var list = Program.FileSystem.StorageFolder.GetFolder("D:\\FONT").GetFolders();
             if (list.Length == 0)
             {
                 Debug.WriteLine("没有字库文件");
