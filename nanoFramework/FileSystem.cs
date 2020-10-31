@@ -19,11 +19,22 @@ namespace NFApp1
                 Configuration.SetPinFunction(22, DeviceFunction.SPI1_MOSI);
 
                 SDCard.MountSpi("SPI1", 13);
-                StorageFolder = KnownFolders.RemovableDevices;
+                StorageFolder = KnownFolders.RemovableDevices.GetFolders()[0];
                 IsRun = true;
                 Debug.WriteLine("SDcard Ready!");
 
                 foreach (var item in StorageFolder.GetFolders())
+                {
+                    Debug.WriteLine("文件夹：" + item.Name);
+                    foreach (var item1 in item.GetFiles())
+                    {
+                        Debug.WriteLine("文件：" + item1.Name);
+                    }
+                }
+
+                var in1 = KnownFolders.InternalDevices;
+
+                foreach (var item in in1.GetFolders())
                 {
                     Debug.WriteLine("文件夹：" + item.Name);
                     foreach (var item1 in item.GetFiles())

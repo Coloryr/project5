@@ -69,33 +69,39 @@ namespace NFApp1
 
             string json = JsonConvert.SerializeObject(list);
 
-            //StongeFile = StorageFile.GetFileFromPath("D:\\System.Net.dll");
-            //var ass = Assembly.Load("D:\\System.Net.dll");
+            StongeFile = StorageFile.GetFileFromPath("D:\\out.dll");
+            var buff = FileIO.ReadBuffer(StongeFile);
+            var read = DataReader.FromBuffer(buff);
+            var tem1 = new byte[buff.Length];
+            read.ReadBytes(tem1);
 
-            //var type = ass.GetTypes()[0];
-            //MethodInfo MethodInfo = type.GetMethods()[0];
-            //MethodInfo.Invoke(ass, null);
+            var file = KnownFolders.InternalDevices.GetFolders()[0].CreateFile("out.dll", CreationCollisionOption.ReplaceExisting);
+            FileIO.WriteBytes(file, tem1);
 
-            //object obj = type.InvokeMember(null, BindingFlags.Public, null, null, null);
+            //var ass = Assembly.Load("out.dll");
+            var ass = Assembly.Load(tem1);
+
+            var type = ass.GetTypes()[0];
+            MethodInfo MethodInfo = type.GetMethods()[0];
+            MethodInfo.Invoke(ass, null);
+
+            object obj = type.InvokeMember(null, BindingFlags.Public, null, null, null);
 
 
-            //type.InvokeMember("test", BindingFlags.Public, null, obj, new object[] { });
+            type.InvokeMember("test", BindingFlags.Public, null, obj, new object[] { });
 
-            var removableDevices = FileSystem.StorageFolder.GetFolders();
-            StorageFolder device = removableDevices[0];
-
-            try
-            {
-                StongeFile = StorageFile.GetFileFromPath("D:\\save.json");
-                FONT.Init(StongeFile);
-            }
-            catch
-            {
-                var folderNew = device.CreateFolder("ColoryrMCU", CreationCollisionOption.ReplaceExisting);
-                StongeFile = folderNew.CreateFile("save.json", CreationCollisionOption.ReplaceExisting);
-                FileIO.WriteText(StongeFile, json);
-                //FONT.Create(StongeFile);
-            }
+            //try
+            //{
+            //    StongeFile = StorageFile.GetFileFromPath("D:\\save.json");
+            //    FONT.Init(StongeFile);
+            //}
+            //catch
+            //{
+            //    var folderNew = device.CreateFolder("ColoryrMCU", CreationCollisionOption.ReplaceExisting);
+            //    StongeFile = folderNew.CreateFile("save.json", CreationCollisionOption.ReplaceExisting);
+            //    FileIO.WriteText(StongeFile, json);
+            //    //FONT.Create(StongeFile);
+            //}
 
             Debug.WriteLine(">> " + " free memory: " + nanoFramework.Runtime.Native.GC.Run(true) + " bytes");
 
