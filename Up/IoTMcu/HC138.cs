@@ -1,4 +1,5 @@
-﻿using System.Device.Gpio;
+﻿using System;
+using System.Device.Gpio;
 
 namespace IoTMcu
 {
@@ -10,7 +11,7 @@ namespace IoTMcu
         private const int A3 = 16;
         private const int AEN = 26;
 
-        public byte Local { get; set; }
+        public int Local { get; set; }
 
         public HC138()
         {
@@ -28,7 +29,7 @@ namespace IoTMcu
         }
         public void SetPin()
         {
-            IoTMcuMain.GpioController.Write(A0, (Local &0x01) == 0x01? PinValue.High: PinValue.Low);
+            IoTMcuMain.GpioController.Write(A0, (Local & 0x01) == 0x01 ? PinValue.High : PinValue.Low);
             IoTMcuMain.GpioController.Write(A1, (Local & 0x02) == 0x01 ? PinValue.High : PinValue.Low);
             IoTMcuMain.GpioController.Write(A2, (Local & 0x04) == 0x01 ? PinValue.High : PinValue.Low);
             IoTMcuMain.GpioController.Write(A3, (Local & 0x08) == 0x01 ? PinValue.High : PinValue.Low);
@@ -39,17 +40,20 @@ namespace IoTMcu
         }
         public void AddPos()
         {
-            if (Local >= 15)
-                Local = 0;
-            else
-                Local++;
+            Local++;
             SetPin();
         }
-        public void SetPos(byte pos)
+        public void SetPos(int pos)
         {
             if (pos > 15)
                 return;
             Local = pos;
+            SetPin();
+        }
+
+        public void Reset()
+        {
+            Local = 0;
             SetPin();
         }
     }

@@ -1,93 +1,64 @@
 ﻿using System.Collections;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.IO;
 
 namespace IoTMcu
 {
-    class FontType
+    public enum FontSize
+    {
+        px12, px16, px24, px32
+    }
+    public class FontType
     {
         public string Name { get; set; }
-        public long px12 { get; set; }
-        public long px16 { get; set; }
-        public long px24 { get; set; }
-        public long px32 { get; set; }
+        public byte[] px12 { get; set; }
+        public byte[] px16 { get; set; }
+        public byte[] px24 { get; set; }
+        public byte[] px32 { get; set; }
     }
-    public class FONT
+    public class Font
     {
+        //先只支持一种字体
+        //public static readonly Dictionary<string, FontType> FontList = new Dictionary<string, FontType>();
+        private FontType FontSave;
+        private string Local = IoTMcuMain.Local + "Font/";
         private Stack data;
-        public void Init(StorageFile save)
+        public Font()
         {
-            data = (Stack)JsonConvert.DeserializeObject(DataReader.FromBuffer(FileIO.ReadBuffer(save)), data.GetType());
-            if (data.Count == 0)
+            if (!Directory.Exists(Local))
             {
-
+                Directory.CreateDirectory(Local);
+            }
+            FontSave = new FontType();
+            if (File.Exists(Local + "px12.font"))
+            {
+                FontSave.px12 = File.ReadAllBytes(Local + "px12.font");
+                Logs.Log("发现px12字体");
+            }
+            if (File.Exists(Local + "px16.font"))
+            {
+                FontSave.px16 = File.ReadAllBytes(Local + "px16.font");
+                Logs.Log("发现px16字体");
+            }
+            if (File.Exists(Local + "px24.font"))
+            {
+                FontSave.px24 = File.ReadAllBytes(Local + "px24.font");
+                Logs.Log("发现px24字体");
+            }
+            if (File.Exists(Local + "px32.font"))
+            {
+                FontSave.px32 = File.ReadAllBytes(Local + "px32.font");
+                Logs.Log("发现px32字体");
             }
         }
-
-        public void Create(StorageFile save)
+        public void WriteFont(byte[] buffer, string name)
         {
-            int add = 0;
-            var list = IoTMcuMain.FileSystem.StorageFolder.GetFolder("D:\\FONT").GetFolders();
-            if (list.Length == 0)
-            {
-                Debug.WriteLine("没有字库文件");
-                new ErrorRun();
-            }
-            foreach (var item in list)
-            {
-                var list1 = item.GetFiles();
-                if (list1.Length == 0)
-                    continue;
-                var obj = new FontType
-                {
-                    Name = item.Name
-                };
-                foreach (var item2 in list1)
-                {
-                    if (item2.Name == "GBK12")
-                    {
-                        obj.px12 = add * 1024 * 1024;
-                        WriteFont(DataReader.FromBuffer(FileIO.ReadBuffer(item2)), obj.px12);
-                    }
-                }
-                add++;
-            }
-            if (add == 0)
-            {
-                Debug.WriteLine("没有字库文件");
-                new ErrorRun();
-            }
+            File.WriteAllBytes(Local + name, buffer);
         }
 
-        private void WriteFont(DataReader buffer, long Addr)
+        public void GenShow(char data, List<byte[]> show, int start, FontSize size)
         {
-            if (buffer.UnconsumedBufferLength < 4096)
-            {
-                var temp = new byte[buffer.UnconsumedBufferLength];
-                buffer.ReadBytes(temp);
-                IoTMcuMain.FLASH.Write(temp, buffer.UnconsumedBufferLength);
-            }
-            else
-            {
-                uint now = 0;//偏移
-                var temp = new byte[4096];
-                for (; ; )
-                {
-                    if (now > buffer.UnconsumedBufferLength)
-                    {
-                        uint size = now - buffer.UnconsumedBufferLength;
-                        temp = new byte[size];
-                        buffer.ReadBytes(temp);
-                        IoTMcuMain.FLASH.Write(temp, Addr + now - 4096);
-                        break;
-                    }
-                    else
-                    {
-                        buffer.ReadBytes(temp);
-                        IoTMcuMain.FLASH.Write(temp, Addr + now);
-                    }
-                    now += 4096;
-                }
-            }
+
         }
     }
 }
