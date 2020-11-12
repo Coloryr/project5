@@ -48,61 +48,44 @@ namespace IoTMcu
         {
             IoTMcuMain.GpioController.Write(MOUT, val ? PinValue.Low : PinValue.High);
         }
-        public void SetRDate(byte[] data1, byte[] data2, int size)
+        public void SetRDate(PinValue[] data1, PinValue[] data2, int size, bool both = true)
         {
-            byte i;
             int local;
-            byte data_1;
-            byte data_2;
 
             for (local = 0; local < size; local++)
             {
-                data_1 = data1[local];
-                data_2 = data2[local];
-                for (i = 0; i < 8; i++)
+                IoTMcuMain.GpioController.Write(M1BLU, data1[local]);
+                if (both)
                 {
-                    IoTMcuMain.GpioController.Write(M1BLU, (data_1 & 0x01) == 1 ? PinValue.High : PinValue.Low);
-                    IoTMcuMain.GpioController.Write(M2BLU, (data_2 & 0x01) == 1 ? PinValue.High : PinValue.Low);
-
-                    data_1 <<= 1;
-                    data_2 <<= 1;
-
-                    IoTMcuMain.GpioController.Write(MRCLK, PinValue.Low);
-                    Thread.Sleep(TimeSpan.FromMilliseconds(10));
-                    IoTMcuMain.GpioController.Write(MRCLK, PinValue.High);
+                    IoTMcuMain.GpioController.Write(M2BLU, data2[local]);
                 }
-                IoTMcuMain.GpioController.Write(MRLOCK, PinValue.High);
+
+                IoTMcuMain.GpioController.Write(MRCLK, PinValue.Low);
                 Thread.Sleep(TimeSpan.FromMilliseconds(10));
-                IoTMcuMain.GpioController.Write(MRLOCK, PinValue.Low);
+                IoTMcuMain.GpioController.Write(MRCLK, PinValue.High);
             }
+            IoTMcuMain.GpioController.Write(MRLOCK, PinValue.High);
+            Thread.Sleep(TimeSpan.FromMilliseconds(10));
+            IoTMcuMain.GpioController.Write(MRLOCK, PinValue.Low);
         }
-        public void SetBDate(byte[] data1, byte[] data2, int size)
+        public void SetBDate(PinValue[] data1, PinValue[] data2, int size, bool both = true)
         {
-            byte i;
             int local;
-            byte data_1;
-            byte data_2;
 
             for (local = 0; local < size; local++)
             {
-                data_1 = data1[local];
-                data_2 = data2[local];
-                for (i = 0; i < 8; i++)
+                IoTMcuMain.GpioController.Write(M1RED, data1[local]);
+                if (both)
                 {
-                    IoTMcuMain.GpioController.Write(M1RED, (data_1 & 0x01) == 1 ? PinValue.High : PinValue.Low);
-                    IoTMcuMain.GpioController.Write(M2RED, (data_2 & 0x01) == 1 ? PinValue.High : PinValue.Low);
-
-                    data_1 <<= 1;
-                    data_2 <<= 1;
-
-                    IoTMcuMain.GpioController.Write(MBCLK, PinValue.Low);
-                    Thread.Sleep(TimeSpan.FromMilliseconds(10));
-                    IoTMcuMain.GpioController.Write(MBCLK, PinValue.High);
+                    IoTMcuMain.GpioController.Write(M2RED, data2[local]);
                 }
-                IoTMcuMain.GpioController.Write(MBLOCK, PinValue.High);
+                IoTMcuMain.GpioController.Write(MBCLK, PinValue.Low);
                 Thread.Sleep(TimeSpan.FromMilliseconds(10));
-                IoTMcuMain.GpioController.Write(MBLOCK, PinValue.Low);
+                IoTMcuMain.GpioController.Write(MBCLK, PinValue.High);
             }
+            IoTMcuMain.GpioController.Write(MBLOCK, PinValue.High);
+            Thread.Sleep(TimeSpan.FromMilliseconds(10));
+            IoTMcuMain.GpioController.Write(MBLOCK, PinValue.Low);
         }
     }
 }

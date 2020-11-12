@@ -1,4 +1,6 @@
 ﻿using Lib;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -9,7 +11,7 @@ namespace IoTMcu
     class StateObject
     {
         public Socket workSocket = null;
-        public const int BufferSize = 1024;
+        public const int BufferSize = 8196;
         public byte[] buffer = new byte[BufferSize];
         public StringBuilder sb = new StringBuilder();
     }
@@ -82,6 +84,18 @@ namespace IoTMcu
                 {
                     string temp = Encoding.UTF8.GetString(state.buffer);
                     temp = temp.Trim();
+                    var obj = JsonConvert.DeserializeObject<IoTPackObj>(temp);
+                    switch (obj.Type)
+                    {
+                        case PackType.Download:
+                            new DownloadFile
+                            {
+                                local = obj.Name,
+                                socket = handler,
+                                 size = obj.Data1
+                            }.Start();
+                            break;
+                    }
                 }
             }
             handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(NextReceiveCallBack), state);

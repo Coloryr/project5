@@ -16,7 +16,7 @@ namespace IoTMcu
         public static ShowSave Show;
         public static HC138 HC138;
         public static HC595 HC595;
-        public static Font Font;
+        public static FontSave Font;
         static void Main(string[] args)
         {
             Logs.Log("Mcu Start");
@@ -42,7 +42,7 @@ namespace IoTMcu
                 },
                 NeedServer = false,
                 Height = 32,
-                Withe = 16,
+                Width = 16,
                 Name = "LED1"
             });
             Logs.Log("Start Hardway");
@@ -50,10 +50,11 @@ namespace IoTMcu
             HC595 = new HC595();
             Logs.Log("Start Socket");
             SocketIoT = new SocketIoT();
-            Logs.Log("Start Font");
-            Font = new Font();
             Logs.Log("Start Show");
             Show = new ShowSave();
+            Logs.Log("Start Font");
+            Font = new FontSave(Show.ShowImg);
+            
         }
     }
 }

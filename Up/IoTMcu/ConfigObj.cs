@@ -6,15 +6,6 @@ namespace IoTMcu
     { 
         Normal, 
     }
-    public class FontSave
-    {
-        public string Name { get; set; }
-        public string Local { get; set; }
-        public string px12 { get; set; }
-        public string px16 { get; set; }
-        public string px24 { get; set; }
-        public string px32 { get; set; }
-    }
     public class SocketSave
     {
         public string IP { get; set; }
@@ -28,7 +19,7 @@ namespace IoTMcu
         public SocketSave ServerSocket { get; set; }
         public bool NeedServer { get; set; }
         public List<FontSave> FontList { get; set; }
-        public int Withe { get; set; }
+        public int Width { get; set; }
         public int Height { get; set; }
     }
     public class ShowObj

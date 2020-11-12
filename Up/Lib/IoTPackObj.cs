@@ -2,7 +2,7 @@
 {
     public enum PackType
     {
-        Start, Close, Send, Change, Data, Test
+        Start, Close, Send, Change, Data, Test, Download
     }
     class IoTPackObj
     {
