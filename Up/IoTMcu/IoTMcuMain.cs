@@ -54,7 +54,7 @@ namespace IoTMcu
             Show = new ShowSave();
             Logs.Log("Start Font");
             Font = new FontSave(Show.ShowImg);
-            
+            Logs.Log("Start!!!");
         }
     }
 }

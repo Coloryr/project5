@@ -64,9 +64,6 @@ namespace IoTMcu
                 Thread.Sleep(TimeSpan.FromMilliseconds(10));
                 IoTMcuMain.GpioController.Write(MRCLK, PinValue.High);
             }
-            IoTMcuMain.GpioController.Write(MRLOCK, PinValue.High);
-            Thread.Sleep(TimeSpan.FromMilliseconds(10));
-            IoTMcuMain.GpioController.Write(MRLOCK, PinValue.Low);
         }
         public void SetBDate(PinValue[] data1, PinValue[] data2, int size, bool both = true)
         {
@@ -83,8 +80,14 @@ namespace IoTMcu
                 Thread.Sleep(TimeSpan.FromMilliseconds(10));
                 IoTMcuMain.GpioController.Write(MBCLK, PinValue.High);
             }
+        }
+
+        public void Unlock()
+        {
             IoTMcuMain.GpioController.Write(MBLOCK, PinValue.High);
+            IoTMcuMain.GpioController.Write(MRLOCK, PinValue.High);
             Thread.Sleep(TimeSpan.FromMilliseconds(10));
+            IoTMcuMain.GpioController.Write(MRLOCK, PinValue.Low);
             IoTMcuMain.GpioController.Write(MBLOCK, PinValue.Low);
         }
     }
