@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Device.Gpio;
+using System.Threading;
 
 namespace IoTMcu
 {
@@ -9,7 +10,7 @@ namespace IoTMcu
         public static readonly GpioController GpioController = new GpioController();
 
         public static string Local;
-        public static bool IsBoot;
+        public static ManualResetEvent IsBoot = new ManualResetEvent(false);
 
         public static ConfigObj Config;
         public static SocketIoT SocketIoT;
@@ -17,7 +18,7 @@ namespace IoTMcu
         public static HC138 HC138;
         public static HC595 HC595;
         public static FontSave Font;
-        static void Main(string[] args)
+        static void Main()
         {
             Logs.Log("Mcu Start");
             Local = AppDomain.CurrentDomain.BaseDirectory;
@@ -43,17 +44,17 @@ namespace IoTMcu
                 NeedServer = false,
                 Height = 32,
                 Width = 16,
-                Name = "LED1"
+                Name = "LCD1"
             });
             Logs.Log("Start Hardway");
-            HC138 = new HC138();
-            HC595 = new HC595();
+            HC138 = new();
+            HC595 = new();
             Logs.Log("Start Socket");
-            SocketIoT = new SocketIoT();
+            SocketIoT = new();
             Logs.Log("Start Show");
-            Show = new ShowSave();
+            Show = new();
             Logs.Log("Start Font");
-            Font = new FontSave(Show.ShowImg);
+            Font = new();
             Logs.Log("Start!!!");
         }
     }

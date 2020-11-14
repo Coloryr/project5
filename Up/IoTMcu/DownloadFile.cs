@@ -1,33 +1,46 @@
-﻿using System.IO;
+﻿using Lib;
+using System.IO;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IoTMcu
 {
     class DownloadFile
     {
+        private ManualResetEvent WriteLock = new(false);
         private FileStream FileStream;
-        public string local { get; set; }
-        public Socket socket { get; set; }
-        public long size { get; set; }
 
-        public async void Start()
+        public string name;
+        public string local;
+        public Socket socket;
+        public long size;
+
+        public void Start()
         {
-            IoTMcuMain.IsBoot = true;
-            long now = 0;
-            int down;
-            byte[] re = new byte[2] { 0x55, 0xaa };
-            byte[] temp = new byte[8196];
+            IoTMcuMain.IsBoot.Set();
+            Thread.Sleep(20);
             FileStream = File.OpenWrite(local);
-            while (now < size)
+        }
+
+        public void Write(byte[] data)
+        {
+            Task.Run(async () =>
             {
-                down = socket.Receive(temp, 8196, SocketFlags.None);
-                now += down;
+                WriteLock.WaitOne();
+                int down = data.Length;
                 size -= down;
-                await FileStream.WriteAsync(temp, 0, down);
-                socket.Send(re);
-            }
-            await FileStream.DisposeAsync();
-            IoTMcuMain.IsBoot = false;
+                WriteLock.Set();
+                await FileStream.WriteAsync(data, 0, down);
+                if (size <= 0)
+                {
+                    await FileStream.DisposeAsync();
+                    IoTMcuMain.SocketIoT.TaskDone(name);
+                    IoTMcuMain.IsBoot.Reset();
+                }
+                socket.Send(SocketPack.ResPack);
+                WriteLock.Reset();
+            });
         }
     }
 }

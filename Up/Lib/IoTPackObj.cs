@@ -2,14 +2,15 @@
 {
     public enum PackType
     {
-        Start, Close, Send, Change, Data, Test, Download
+        ShowList, AddShow, DeleteShow, ChangeShow, Test, AddFont, DeleteFont
     }
     class IoTPackObj
     {
-        public string Name { get; set; }
         public PackType Type { get; set; }
-        public string Text { get; set; }
         public string Data { get; set; }
-        public int Data1 { get; set; }
+        public string Data1 { get; set; }
+        public int Data2 { get; set; }
+        public int Data3 { get; set; }
+        public int Data4 { get; set; }
     }
 }

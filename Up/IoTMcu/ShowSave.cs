@@ -9,6 +9,10 @@ namespace IoTMcu
 {
     class ShowSave
     {
+        public static readonly string Local = IoTMcuMain.Local + "ShowList\\";
+
+        public static Bitmap ShowImg;
+
         private readonly List<ShowObj> ShowList = new List<ShowObj>();
         private readonly List<PinValue[]> ShowRedTemp = new List<PinValue[]>();
         private readonly List<PinValue[]> ShowBulTemp = new List<PinValue[]>();
@@ -16,16 +20,70 @@ namespace IoTMcu
         private Thread UpdateThread;
         private Thread ShowThread;
 
-        public Bitmap ShowImg;
-
         private Color Red;
         private Color Blue;
         private Color Mix;
 
-        private int Bank =0 ;
+        private int Bank = 0;
         private int Number = 0;
-        private string Local = IoTMcuMain.Local + "ShowList\\";
+
         public ShowSave()
+        {
+            var ColorConverter = new ColorConverter();
+            Red = (Color)ColorConverter.ConvertFromString(Brushes.Red.ToString());
+            Blue = (Color)ColorConverter.ConvertFromString(Brushes.Blue.ToString());
+            Mix = (Color)ColorConverter.ConvertFromString(Brushes.Orange.ToString());
+
+            UpdateThread = new Thread(() =>
+            {
+                bool updata = true;
+                int showindex = 0;
+                int showdelay = 0;
+                for (; ; )
+                {
+                    IoTMcuMain.IsBoot.WaitOne();
+                    var show = IoTMcuMain.Show.ShowList[showindex];
+                    if (updata)
+                    {
+                        for (int i = 0; i < IoTMcuMain.Config.Width; i++)
+                        {
+                            for (int j = 0; j < IoTMcuMain.Config.Height; j++)
+                            {
+                                var temp = ShowImg.GetPixel(i, j);
+                                if (temp == Red)
+                                {
+                                    ShowRedTemp[i][j] = PinValue.Low;
+                                    ShowBulTemp[i][j] = PinValue.High;
+                                }
+                                else if (temp == Blue)
+                                {
+                                    ShowRedTemp[i][j] = PinValue.Low;
+                                    ShowBulTemp[i][j] = PinValue.High;
+                                }
+                                else if (temp == Mix)
+                                {
+                                    ShowRedTemp[i][j] = PinValue.Low;
+                                    ShowBulTemp[i][j] = PinValue.Low;
+                                }
+                                else
+                                {
+                                    ShowRedTemp[i][j] = PinValue.High;
+                                    ShowBulTemp[i][j] = PinValue.High;
+                                }
+                            }
+                        }
+                        updata = false;
+                    }
+                    Thread.Sleep(100);
+                }
+            });
+            Start();
+            ShowThread = new Thread(StartShow);
+            ShowThread.Start();
+            UpdateThread.Start();
+        }
+
+        public void Start()
         {
             if (!Directory.Exists(Local))
             {
@@ -40,12 +98,10 @@ namespace IoTMcu
                     ShowList.Add(temp);
                 }
             }
-
-            var ColorConverter = new ColorConverter();
-            Red = (Color)ColorConverter.ConvertFromString(Brushes.Red.ToString());
-            Blue = (Color)ColorConverter.ConvertFromString(Brushes.Blue.ToString());
-            Mix = (Color)ColorConverter.ConvertFromString(Brushes.Orange.ToString());
-
+            if (ShowImg != null)
+            {
+                ShowImg.Dispose();
+            }
             ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
             Bank = IoTMcuMain.Config.Height / 16;
             Number = IoTMcuMain.Config.Width / 8;
@@ -62,55 +118,6 @@ namespace IoTMcu
                     ShowBulTemp[i][j] = PinValue.High;
                 }
             }
-            UpdateThread = new Thread(() =>
-            {
-                bool updata = true;
-                int showindex = 0;
-                int showdelay = 0;
-                for (; ; )
-                {
-                    if (!IoTMcuMain.IsBoot)
-                    {
-                        var show = IoTMcuMain.Show.ShowList[showindex];
-                        if (updata)
-                        {
-                            for (int i = 0; i < IoTMcuMain.Config.Width; i++)
-                            {
-                                for (int j = 0; j < IoTMcuMain.Config.Height; j++)
-                                {
-                                    var temp = ShowImg.GetPixel(i, j);
-                                    if (temp == Red)
-                                    {
-                                        ShowRedTemp[i][j] = PinValue.Low;
-                                        ShowBulTemp[i][j] = PinValue.High;
-                                    }
-                                    else if (temp == Blue)
-                                    {
-                                        ShowRedTemp[i][j] = PinValue.Low;
-                                        ShowBulTemp[i][j] = PinValue.High;
-                                    }
-                                    else if (temp == Mix)
-                                    {
-                                        ShowRedTemp[i][j] = PinValue.Low;
-                                        ShowBulTemp[i][j] = PinValue.Low;
-                                    }
-                                    else
-                                    {
-                                        ShowRedTemp[i][j] = PinValue.High;
-                                        ShowBulTemp[i][j] = PinValue.High;
-                                    }
-                                }
-                            }
-                            updata = false;
-                        }
-                        
-                    }
-                    Thread.Sleep(100);
-                }
-            });
-            ShowThread = new Thread(StartShow);
-            ShowThread.Start();
-            UpdateThread.Start();
         }
 
         public void StartShow()
@@ -122,6 +129,7 @@ namespace IoTMcu
             {
                 for (; ; )
                 {
+                    IoTMcuMain.IsBoot.WaitOne();
                     Thread.Sleep(10);
                     IoTMcuMain.HC595.SetOut(false);
                     IoTMcuMain.HC595.SetRDate(ShowRedTemp[line], null, Number, false);
@@ -141,6 +149,7 @@ namespace IoTMcu
             {
                 for (; ; )
                 {
+                    IoTMcuMain.IsBoot.WaitOne();
                     Thread.Sleep(10);
                     IoTMcuMain.HC595.SetOut(false);
                     IoTMcuMain.HC595.SetRDate(ShowRedTemp[line], ShowRedTemp[line + 16], Number);

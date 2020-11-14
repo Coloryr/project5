@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -13,16 +14,23 @@ namespace IoTMcu
         public Socket workSocket = null;
         public const int BufferSize = 8196;
         public byte[] buffer = new byte[BufferSize];
-        public StringBuilder sb = new StringBuilder();
     }
     class SocketIoT
     {
         private Socket NextSocket;
         private Socket LastSocket;
         private Socket ServerSocket;
-        private StateObject LastPackObj = new StateObject();
-        private StateObject NextPackObj = new StateObject();
-        private StateObject ServerPackObj = new StateObject();
+
+        private StateObject LastPackObj = new();
+        private StateObject NextPackObj = new();
+        private StateObject ServerPackObj = new();
+
+        private Dictionary<string, DownloadFile> DownloadTasks = new();
+
+        public void TaskDone(string task)
+        { 
+            
+        }
 
         public bool Check(byte[] data)
         {
@@ -85,15 +93,40 @@ namespace IoTMcu
                     string temp = Encoding.UTF8.GetString(state.buffer);
                     temp = temp.Trim();
                     var obj = JsonConvert.DeserializeObject<IoTPackObj>(temp);
+                    var data = Convert.FromBase64String(obj.Data1);
                     switch (obj.Type)
                     {
-                        case PackType.Download:
-                            new DownloadFile
+                        case PackType.AddFont:
+                            if (DownloadTasks.ContainsKey(obj.Data))
                             {
-                                local = obj.Name,
-                                socket = handler,
-                                 size = obj.Data1
-                            }.Start();
+                                DownloadTasks[obj.Data].Write(data);
+                            }
+                            else
+                            {
+                                DownloadTasks.Add(obj.Data, new DownloadFile
+                                {
+                                    name = obj.Data,
+                                    local = FontSave.Local + obj.Data,
+                                    size = obj.Data2,
+                                    socket = handler
+                                });
+                            }
+                            break;
+                        case PackType.AddShow:
+                            if (DownloadTasks.ContainsKey(obj.Data))
+                            {
+                                DownloadTasks[obj.Data].Write(data);
+                            }
+                            else
+                            {
+                                DownloadTasks.Add(obj.Data, new DownloadFile
+                                {
+                                    name = obj.Data,
+                                    local = ShowSave.Local + obj.Data,
+                                    size = obj.Data2,
+                                    socket = handler
+                                });
+                            }
                             break;
                     }
                 }

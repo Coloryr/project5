@@ -5,15 +5,15 @@ using System.IO;
 
 namespace IoTMcu
 {
-    public enum FontSize
+    public class FontData
     {
-        px12 = 12,
-        px16 = 16,
-        px24 = 24,
-        px32 = 32
-    }
-    public class FontColor
-    {
+        public enum FontSize
+        {
+            px12 = 12,
+            px16 = 16,
+            px24 = 24,
+            px32 = 32
+        }
         public enum SelfColor
         {
             RED,
@@ -29,15 +29,20 @@ namespace IoTMcu
     }
     public class FontSave
     {
+        public static readonly string Local = IoTMcuMain.Local + "Font\\";
 
         public readonly Dictionary<string, Font> FontList = new Dictionary<string, Font>();
-        private string Local = IoTMcuMain.Local + "Font\\";
+
         private Graphics Graphics;
-        public FontSave(Bitmap Bitmap)
+        public FontSave()
+        {
+            Start();
+        }
+        public void Start()
         {
             PrivateFontCollection pfc = new PrivateFontCollection();
-            Graphics = Graphics.FromImage(Bitmap);
-            Graphics.FillRectangle(Brushes.Black, 
+            Graphics = Graphics.FromImage(ShowSave.ShowImg);
+            Graphics.FillRectangle(Brushes.Black,
                 new Rectangle(0, 0, IoTMcuMain.Config.Width, IoTMcuMain.Config.Height));
             if (!Directory.Exists(Local))
             {
@@ -45,6 +50,14 @@ namespace IoTMcu
             }
             var list = new DirectoryInfo(Local);
             int index = 0;
+            if (FontList.Count != 0)
+            {
+                foreach (var item in FontList.Values)
+                {
+                    item.Dispose();
+                }
+            }
+            FontList.Clear();
             foreach (var item in list.GetFiles())
             {
                 pfc.AddFontFile(item.FullName);
@@ -57,23 +70,17 @@ namespace IoTMcu
                 FontList.Add(item.Name + "16", f16);
                 FontList.Add(item.Name + "24", f24);
                 FontList.Add(item.Name + "32", f32);
-                
+
                 index++;
             }
             pfc.Dispose();
         }
-
-        public void WriteFont(byte[] buffer, string name)
-        {
-            File.WriteAllBytes(Local + name, buffer);
-        }
-
-        public void GenShow(string data, string FontName, int x, int y, FontSize size, FontColor.SelfColor color)
+        public void GenShow(string data, string FontName, int x, int y, FontData.FontSize size, FontData.SelfColor color)
         {
             for (int i = 0; i < data.Length; i++)
             {
                 Graphics.DrawString(data[i].ToString(),
-                    FontList[FontName + size], FontColor.BrushesSave[color],
+                    FontList[FontName + size], FontData.BrushesSave[color],
                     new PointF(x + i * (int)size, y));
             }
         }
