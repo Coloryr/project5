@@ -3,8 +3,8 @@
 namespace IoTMcu
 {
     public enum ShowType
-    { 
-        Normal, 
+    {
+        Normal,
     }
     public class SocketSave
     {
@@ -23,7 +23,7 @@ namespace IoTMcu
         public int Height { get; set; }
     }
     public class ShowObj
-    { 
+    {
         public ShowType Type { get; set; }
         public string FontName { get; set; }
         public int FontSize { get; set; }

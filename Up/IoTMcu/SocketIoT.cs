@@ -1,6 +1,5 @@
 ﻿using Lib;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -21,18 +20,18 @@ namespace IoTMcu
         private Socket LastSocket;
         private Socket ServerSocket;
 
-        private StateObject LastPackObj = new();
-        private StateObject NextPackObj = new();
-        private StateObject ServerPackObj = new();
+        private readonly StateObject LastPackObj = new();
+        private readonly StateObject NextPackObj = new();
+        private readonly StateObject ServerPackObj = new();
 
         private Dictionary<string, DownloadFile> DownloadTasks = new();
 
         public void TaskDone(string task)
-        { 
-            
+        {
+            DownloadTasks.Remove(task);
         }
 
-        public bool Check(byte[] data)
+        public static bool Check(byte[] data)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -48,7 +47,7 @@ namespace IoTMcu
             }
             return true;
         }
-        public bool CheckServer(byte[] data)
+        public static bool CheckServer(byte[] data)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -108,7 +107,8 @@ namespace IoTMcu
                                     name = obj.Data,
                                     local = FontSave.Local + obj.Data,
                                     size = obj.Data2,
-                                    socket = handler
+                                    socket = handler,
+                                    type = PackType.AddFont
                                 });
                             }
                             break;
@@ -124,7 +124,8 @@ namespace IoTMcu
                                     name = obj.Data,
                                     local = ShowSave.Local + obj.Data,
                                     size = obj.Data2,
-                                    socket = handler
+                                    socket = handler,
+                                    type = PackType.AddShow
                                 });
                             }
                             break;
@@ -146,7 +147,7 @@ namespace IoTMcu
                     temp = temp.Trim();
                 }
             }
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ServerReceiveCallBack), state); 
+            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ServerReceiveCallBack), state);
         }
         public void StartLast()
         {

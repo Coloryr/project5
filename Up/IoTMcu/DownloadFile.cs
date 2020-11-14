@@ -1,4 +1,5 @@
 ﻿using Lib;
+using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
@@ -15,6 +16,7 @@ namespace IoTMcu
         public string local;
         public Socket socket;
         public long size;
+        public PackType type;
 
         public void Start()
         {
@@ -31,11 +33,19 @@ namespace IoTMcu
                 int down = data.Length;
                 size -= down;
                 WriteLock.Set();
-                await FileStream.WriteAsync(data, 0, down);
+                await FileStream.WriteAsync(data.AsMemory(0, down));
                 if (size <= 0)
                 {
                     await FileStream.DisposeAsync();
                     IoTMcuMain.SocketIoT.TaskDone(name);
+                    if (type == PackType.AddFont)
+                    {
+                        IoTMcuMain.Font.Start();
+                    }
+                    else if (type == PackType.AddShow)
+                    {
+                        IoTMcuMain.Show.Start();
+                    }
                     IoTMcuMain.IsBoot.Reset();
                 }
                 socket.Send(SocketPack.ResPack);

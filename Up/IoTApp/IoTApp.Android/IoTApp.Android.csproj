@@ -97,7 +97,7 @@
     <Folder Include="Resources\drawable\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\App1\IoTApp.csproj">
+    <ProjectReference Include="..\IoTApp\IoTApp.csproj">
       <Project>{F11067FF-E776-43A1-A7C6-CB07590AA9E8}</Project>
       <Name>IoTApp</Name>
     </ProjectReference>

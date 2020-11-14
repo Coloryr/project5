@@ -1,5 +1,4 @@
-﻿using Lib;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Device.Gpio;
 using System.Drawing;
 using System.IO;
@@ -24,8 +23,11 @@ namespace IoTMcu
         private Color Blue;
         private Color Mix;
 
+        bool updata = true;
+
         private int Bank = 0;
-        private int Number = 0;
+        private int showindex = 0;
+        private int showdelay = 0;
 
         public ShowSave()
         {
@@ -36,9 +38,7 @@ namespace IoTMcu
 
             UpdateThread = new Thread(() =>
             {
-                bool updata = true;
-                int showindex = 0;
-                int showdelay = 0;
+
                 for (; ; )
                 {
                     IoTMcuMain.IsBoot.WaitOne();
@@ -104,7 +104,6 @@ namespace IoTMcu
             }
             ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
             Bank = IoTMcuMain.Config.Height / 16;
-            Number = IoTMcuMain.Config.Width / 8;
             for (int i = 0; i < IoTMcuMain.Config.Height; i++)
             {
                 ShowRedTemp.Add(new PinValue[IoTMcuMain.Config.Width]);
@@ -122,8 +121,8 @@ namespace IoTMcu
 
         public void StartShow()
         {
-            IoTMcuMain.HC138.SetEnable(true);
-            IoTMcuMain.HC595.SetOut(true);
+            HC138.SetEnable(true);
+            HC595.SetOut(true);
             int line = 0;
             if (Bank == 0)
             {
@@ -131,17 +130,17 @@ namespace IoTMcu
                 {
                     IoTMcuMain.IsBoot.WaitOne();
                     Thread.Sleep(10);
-                    IoTMcuMain.HC595.SetOut(false);
-                    IoTMcuMain.HC595.SetRDate(ShowRedTemp[line], null, Number, false);
-                    IoTMcuMain.HC595.SetBDate(ShowBulTemp[line], null, Number, false);
-                    IoTMcuMain.HC138.AddPos();
-                    IoTMcuMain.HC595.Unlock();
-                    IoTMcuMain.HC595.SetOut(true);
+                    HC595.SetDate(ShowRedTemp[line], null,
+                        ShowBulTemp[line], null, IoTMcuMain.Config.Width, false);
+                    HC595.SetOut(false);
+                    HC138.AddPos();
+                    HC595.Unlock();
+                    HC595.SetOut(true);
                     line++;
                     if (IoTMcuMain.Config.Width >= line)
                     {
                         line = 0;
-                        IoTMcuMain.HC138.Reset();
+                        HC138.Reset();
                     }
                 }
             }
@@ -151,17 +150,17 @@ namespace IoTMcu
                 {
                     IoTMcuMain.IsBoot.WaitOne();
                     Thread.Sleep(10);
-                    IoTMcuMain.HC595.SetOut(false);
-                    IoTMcuMain.HC595.SetRDate(ShowRedTemp[line], ShowRedTemp[line + 16], Number);
-                    IoTMcuMain.HC595.SetBDate(ShowBulTemp[line], ShowBulTemp[line + 16], Number);
-                    IoTMcuMain.HC138.AddPos();
-                    IoTMcuMain.HC595.Unlock();
-                    IoTMcuMain.HC595.SetOut(true);
+                    HC595.SetDate(ShowRedTemp[line], ShowRedTemp[line + 16],
+                        ShowBulTemp[line], ShowBulTemp[line + 16], IoTMcuMain.Config.Width);
+                    HC595.SetOut(false);
+                    HC138.AddPos();
+                    HC595.Unlock();
+                    HC595.SetOut(true);
                     line++;
                     if (IoTMcuMain.Config.Width >= line)
                     {
                         line = 0;
-                        IoTMcuMain.HC138.Reset();
+                        HC138.Reset();
                     }
                 }
             }

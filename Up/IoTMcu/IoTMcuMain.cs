@@ -15,8 +15,6 @@ namespace IoTMcu
         public static ConfigObj Config;
         public static SocketIoT SocketIoT;
         public static ShowSave Show;
-        public static HC138 HC138;
-        public static HC595 HC595;
         public static FontSave Font;
         static void Main()
         {
@@ -47,8 +45,8 @@ namespace IoTMcu
                 Name = "LCD1"
             });
             Logs.Log("Start Hardway");
-            HC138 = new();
-            HC595 = new();
+            new HC138();
+            new HC595();
             Logs.Log("Start Socket");
             SocketIoT = new();
             Logs.Log("Start Show");
