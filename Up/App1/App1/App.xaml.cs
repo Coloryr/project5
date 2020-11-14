@@ -1,6 +1,6 @@
 ﻿using Xamarin.Forms;
 
-namespace App1
+namespace IoTApp
 {
     public partial class App : Application
     {

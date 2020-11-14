@@ -4,7 +4,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 
-namespace App1.Droid
+namespace IoTApp.Droid
 {
     [Activity(Label = "App1", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
