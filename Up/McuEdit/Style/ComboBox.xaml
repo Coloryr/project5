@@ -61,7 +61,7 @@
         </Setter>
     </Style>
     <!--Combox-->
-    <Style TargetType="ComboBox" x:Key="ComboBoxStyle">
+    <Style x:Name="ComboBox" TargetType="{x:Type ComboBox}">
         <Setter Property="SnapsToDevicePixels"
             Value="true" />
         <Setter Property="OverridesDefaultStyle"
@@ -108,13 +108,17 @@
                             <ColumnDefinition Width="0.3*" MaxWidth="30"/>
                         </Grid.ColumnDefinitions>
                         <!--文字区域背景和边线样式-->
-                        <TextBox Background="#44898989" VerticalAlignment="Center"  Grid.Column="0" Foreground="#FFFFFFFF" BorderBrush="#5EBDD300" BorderThickness="0" IsReadOnly="{TemplateBinding IsReadOnly}" Text="{TemplateBinding Text}"></TextBox>
+                        <Rectangle Fill="#44898989" />
+                        <TextBox Background="Transparent" VerticalAlignment="Center"
+                                 Grid.Column="0" Foreground="#FFFFFFFF" BorderBrush="#5EBDD300" BorderThickness="0" 
+                                 IsReadOnly="{TemplateBinding IsReadOnly}" Text="{TemplateBinding Text}"></TextBox>
                         <Border  Grid.Column="0" BorderThickness="1" BorderBrush="#CC5EBDD3" CornerRadius="1,0,0,1">
 
                         </Border>
                         <!--右侧下拉button设置-->
-                        <Border Grid.Column="1" BorderThickness="0,1,1,1" BorderBrush="#CC5EBDD3" CornerRadius="0,1,1,0">
-                            <ToggleButton BorderThickness="3" BorderBrush="#FF5EBDD3" Style="{StaticResource ComboxStyleBtn}" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"></ToggleButton>
+                        <Border Grid.Column="1" BorderThickness="0,1,1,1" BorderBrush="#CC5EBDD3" CornerRadius="0,1,1,0" Background="#11898989">
+                            <ToggleButton BorderThickness="3" BorderBrush="#FF5EBDD3" Style="{StaticResource ComboxStyleBtn}"
+                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"></ToggleButton>
                         </Border>
                         <!--弹出popup整体设置-->
                         <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" x:Name="Popup" Focusable="False" AllowsTransparency="True" PopupAnimation="Slide" >
