@@ -91,12 +91,12 @@
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="325,4,0,0" TextWrapping="Wrap" Text="0"
                     VerticalAlignment="Top" Width="60"/>
                 <Label Content="字体大小" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0"/>
-                <StackPanel HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="159" Margin="58,27,0,0" Orientation="Horizontal">
-                    <RadioButton Content="12" Style="{DynamicResource RadioButton_Left}" IsChecked="True"/>
-                    <RadioButton Content="16" Style="{DynamicResource RadioButton_Middle}"/>
-                    <RadioButton Content="24" Style="{DynamicResource RadioButton_Middle}"/>
-                    <RadioButton Content="32" Style="{DynamicResource RadioButton_Right}"/>
-                </StackPanel>
+                <Grid HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="79" Margin="58,27,0,0">
+                    <RadioButton Content="12" Style="{DynamicResource RadioButton_Left}" IsChecked="True" Margin="0,0,59,0"/>
+                    <RadioButton Content="16" Style="{DynamicResource RadioButton_Middle}" Margin="20,0,39,0"/>
+                    <RadioButton Content="24" Style="{DynamicResource RadioButton_Middle}" Margin="39,0,20,0"/>
+                    <RadioButton Content="32" Style="{DynamicResource RadioButton_Right}" Margin="59,0,0,0"/>
+                </Grid>
             </Grid>
         </GroupBox>
 

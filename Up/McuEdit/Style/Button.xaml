@@ -7,16 +7,21 @@
                 <ControlTemplate TargetType="Button">
                     <!--定义圆角外边框-->
                     <Border Name="gridborder" BorderThickness="1" CornerRadius="3">
-                        <TextBlock x:Name="data" Text="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="data" Text="{TemplateBinding Content}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="gridborder" Property="Background" Value="#AA5EBDD3"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter TargetName="gridborder" Property="Background" Value="#FF5EBDD3"/>
+                        </Trigger>
                         <Trigger Property="IsEnabled" Value="true">
-                            <Setter TargetName="gridborder" Property="Background" Value="#00000000"/>
                             <Setter TargetName="gridborder" Property="BorderBrush" Value="#FF5EBDD3"/>
                             <Setter TargetName="data" Property="Foreground" Value="Black"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter TargetName="gridborder" Property="Background" Value="#00000000"/>
                             <Setter TargetName="gridborder" Property="BorderBrush" Value="#FF5EBDD3"/>
                             <Setter TargetName="data" Property="Foreground" Value="#FFCDCDCD"/>
                         </Trigger>
