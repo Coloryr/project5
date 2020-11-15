@@ -5,8 +5,101 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:McuEdit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="屏幕编辑" Height="362" Width="652">
     <Grid>
-        
+        <Rectangle Fill="#FFF4F4F5" Stroke="#CC5EBDD3" StrokeThickness="5"/>
+        <GroupBox Header="屏幕连接" HorizontalAlignment="Left" Height="93" VerticalAlignment="Top" Width="176" Margin="10,10,0,0">
+            <Grid>
+                <Button Content="连接" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="10,27,0,0" Height="18"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="45,4,0,0" TextWrapping="Wrap" Text="192.168.0.100"
+                         VerticalAlignment="Top" Width="120"/>
+                <Label Content="IP地址" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Button Content="自动扫描" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="89,27,0,0" Height="18"/>
+                <Ellipse Fill="Red" HorizontalAlignment="Left" Height="15" Stroke="#CC5EBDD3" 
+                         StrokeThickness="1" VerticalAlignment="Top" Width="15" Margin="150,50,0,0"/>
+                <Label Content="未连接" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,45,0,-2"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="屏幕设置" HorizontalAlignment="Left" Height="97" VerticalAlignment="Top" Width="176" Margin="10,108,0,0">
+            <Grid>
+                <Label Content="长度" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Label Content="高度" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="84,0,0,0"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="34,4,0,0" TextWrapping="Wrap" Text="32"
+                         VerticalAlignment="Top" Width="50"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="118,4,0,0" TextWrapping="Wrap" Text="16"
+                    VerticalAlignment="Top" Width="50"/>
+                <Button Content="设置" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="94,50,0,0" Height="18"/>
+                <Label Content="长度" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Label Content="名字" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,22,0,0"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="34,27,0,0" TextWrapping="Wrap" Text="LCD1"
+                    VerticalAlignment="Top" Width="134"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="字体列表" HorizontalAlignment="Left" Height="195" VerticalAlignment="Top" Width="214" Margin="191,10,0,0">
+            <Grid>
+                <ListView HorizontalAlignment="Left" Height="138" VerticalAlignment="Top" Width="202" Margin="4,4,0,0">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="字体" Width="180" DisplayMemberBinding="{Binding 群号}"/>
+                        </GridView>
+                    </ListView.View>
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="添加" Click="AddFont"/>
+                            <MenuItem Header="删除" Click="DeleteFont"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                </ListView>
+                <Button Content="刷新" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,147,0,0" Height="18"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="显示列表" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Width="214" Margin="410,10,0,0">
+            <Grid>
+                <ListView HorizontalAlignment="Left" Height="243" VerticalAlignment="Top" Width="202" Margin="4,4,0,0">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="列表" Width="40" DisplayMemberBinding="{Binding 队列}"/>
+                            <GridViewColumn Header="显示" Width="140" DisplayMemberBinding="{Binding 显示}"/>
+                        </GridView>
+                    </ListView.View>
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="添加" Click="AddShow"/>
+                            <MenuItem Header="修改" Click="ChangeShow"/>
+                            <MenuItem Header="删除" Click="DeleteShow"/>
+                            <MenuItem Header="上移" Click="MenuItem_Click"/>
+                            <MenuItem Header="下移" Click="MenuItem_Click_1"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                </ListView>
+                <Button Content="刷新" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,252,0,0" Height="18"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="显示修改" HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="395" Margin="10,210,0,0">
+            <Grid>
+                <Button Content="设置" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="311,52,0,0" Height="18"/>
+                <Label Content="名字" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="34,4,0,0" TextWrapping="Wrap" Text="Show1"
+                         VerticalAlignment="Top" Width="98"/>
+                <Label Content="X" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="132,0,0,0"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="150,4,0,0" TextWrapping="Wrap" Text="0"
+                    VerticalAlignment="Top" Width="50"/>
+                <Label Content="Y" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200,0,0,0"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="217,4,0,0" TextWrapping="Wrap" Text="0"
+                    VerticalAlignment="Top" Width="50"/>
+                <Label Content="显示时间" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="267,0,0,0"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="325,4,0,0" TextWrapping="Wrap" Text="0"
+                    VerticalAlignment="Top" Width="60"/>
+                <Label Content="字体大小" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0"/>
+                <StackPanel HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="159" Margin="58,27,0,0" Orientation="Horizontal">
+                    <RadioButton Content="12" Style="{DynamicResource RadioButton_Left}" IsChecked="True"/>
+                    <RadioButton Content="16" Style="{DynamicResource RadioButton_Middle}"/>
+                    <RadioButton Content="24" Style="{DynamicResource RadioButton_Middle}"/>
+                    <RadioButton Content="32" Style="{DynamicResource RadioButton_Right}"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+
     </Grid>
 </Window>

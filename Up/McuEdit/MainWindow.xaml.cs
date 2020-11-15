@@ -11,5 +11,40 @@ namespace McuEdit
         {
             InitializeComponent();
         }
+
+        private void DeleteFont(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddFont(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void DeleteShow(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ChangeShow(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddShow(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -12,9 +12,9 @@ namespace IoTMcu
 
         public static Bitmap ShowImg;
 
-        private readonly List<ShowObj> ShowList = new List<ShowObj>();
-        private readonly List<PinValue[]> ShowRedTemp = new List<PinValue[]>();
-        private readonly List<PinValue[]> ShowBulTemp = new List<PinValue[]>();
+        private readonly Dictionary<int, ShowObj> ShowList = new();
+        private readonly List<PinValue[]> ShowRedTemp = new();
+        private readonly List<PinValue[]> ShowBulTemp = new();
 
         private Thread UpdateThread;
         private Thread ShowThread;
@@ -31,14 +31,13 @@ namespace IoTMcu
 
         public ShowSave()
         {
-            var ColorConverter = new ColorConverter();
+            ColorConverter ColorConverter = new();
             Red = (Color)ColorConverter.ConvertFromString(Brushes.Red.ToString());
             Blue = (Color)ColorConverter.ConvertFromString(Brushes.Blue.ToString());
             Mix = (Color)ColorConverter.ConvertFromString(Brushes.Orange.ToString());
 
             UpdateThread = new Thread(() =>
             {
-
                 for (; ; )
                 {
                     IoTMcuMain.IsBoot.WaitOne();
