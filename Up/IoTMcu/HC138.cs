@@ -4,11 +4,11 @@ namespace IoTMcu
 {
     public class HC138
     {
-        private const int A0 = 32;
-        private const int A1 = 33;
-        private const int A2 = 25;
-        private const int A3 = 16;
-        private const int AEN = 26;
+        private const int A0 = 15;
+        private const int A1 = 16;
+        private const int A2 = 14;
+        private const int A3 = 3;
+        private const int AEN = 0;
 
         private static int Local;
 

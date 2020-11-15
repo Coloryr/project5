@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using System;
 using System.IO;
 
@@ -10,7 +10,7 @@ namespace IoTMcu
         {
             try
             {
-                File.WriteAllText(local, JsonConvert.SerializeObject(obj));
+                File.WriteAllText(local, JsonSerializer.Serialize(obj));
             }
             catch (Exception e)
             {
@@ -24,12 +24,12 @@ namespace IoTMcu
             {
                 if (!File.Exists(local))
                 {
-                    File.WriteAllText(local, JsonConvert.SerializeObject(obj));
+                    File.WriteAllText(local, JsonSerializer.Serialize(obj));
                     return obj;
                 }
                 else
                 {
-                    return JsonConvert.DeserializeObject<T>(File.ReadAllText(local));
+                    return JsonSerializer.Deserialize<T>(File.ReadAllText(local));
                 }
             }
             catch (Exception e)

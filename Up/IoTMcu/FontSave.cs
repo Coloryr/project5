@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
+using System.Net.Sockets;
 
 namespace IoTMcu
 {
@@ -20,7 +21,7 @@ namespace IoTMcu
             BULE,
             MIX
         }
-        public static readonly Dictionary<SelfColor, Brush> BrushesSave = new Dictionary<SelfColor, Brush>()
+        public static readonly Dictionary<SelfColor, Brush> BrushesSave = new()
         {
             { SelfColor.RED, Brushes.Red},
             { SelfColor.BULE, Brushes.Blue},
@@ -31,7 +32,7 @@ namespace IoTMcu
     {
         public static readonly string Local = IoTMcuMain.Local + "Font\\";
 
-        public readonly Dictionary<string, Font> FontList = new Dictionary<string, Font>();
+        public readonly Dictionary<string, Font> FontList = new();
 
         private Graphics Graphics;
         public FontSave()
@@ -40,7 +41,7 @@ namespace IoTMcu
         }
         public void Start()
         {
-            PrivateFontCollection pfc = new PrivateFontCollection();
+            PrivateFontCollection pfc = new();
             Graphics = Graphics.FromImage(ShowSave.ShowImg);
             Graphics.FillRectangle(Brushes.Black,
                 new Rectangle(0, 0, IoTMcuMain.Config.Width, IoTMcuMain.Config.Height));
@@ -77,11 +78,23 @@ namespace IoTMcu
         }
         public void GenShow(string data, string FontName, int x, int y, FontData.FontSize size, FontData.SelfColor color)
         {
-            for (int i = 0; i < data.Length; i++)
+            if (FontList.ContainsKey(FontName + size))
             {
-                Graphics.DrawString(data[i].ToString(),
-                    FontList[FontName + size], FontData.BrushesSave[color],
-                    new PointF(x + i * (int)size, y));
+                Graphics.DrawString(data, FontList[FontName + size], FontData.BrushesSave[color], new PointF(x, y));
+            }
+        }
+
+        public void RemoveFont(string data, Socket socket)
+        {
+            if (FontList.ContainsKey(data))
+            {
+                FontList[data].Dispose();
+                FontList.Remove(data);
+                SocketIoT.SendNext("ok", socket);
+            }
+            else
+            {
+                SocketIoT.SendNext("no", socket);
             }
         }
     }

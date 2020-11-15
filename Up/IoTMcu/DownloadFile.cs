@@ -25,32 +25,29 @@ namespace IoTMcu
             FileStream = File.OpenWrite(local);
         }
 
-        public void Write(byte[] data)
+        public async void Write(byte[] data)
         {
-            Task.Run(async () =>
+            WriteLock.WaitOne();
+            int down = data.Length;
+            size -= down;
+            WriteLock.Set();
+            await FileStream.WriteAsync(data.AsMemory(0, down));
+            if (size <= 0)
             {
-                WriteLock.WaitOne();
-                int down = data.Length;
-                size -= down;
-                WriteLock.Set();
-                await FileStream.WriteAsync(data.AsMemory(0, down));
-                if (size <= 0)
+                await FileStream.DisposeAsync();
+                IoTMcuMain.SocketIoT.TaskDone(name);
+                if (type == PackType.AddFont)
                 {
-                    await FileStream.DisposeAsync();
-                    IoTMcuMain.SocketIoT.TaskDone(name);
-                    if (type == PackType.AddFont)
-                    {
-                        IoTMcuMain.Font.Start();
-                    }
-                    else if (type == PackType.AddShow)
-                    {
-                        IoTMcuMain.Show.Start();
-                    }
-                    IoTMcuMain.IsBoot.Reset();
+                    IoTMcuMain.Font.Start();
                 }
-                socket.Send(SocketPack.ResPack);
-                WriteLock.Reset();
-            });
+                else if (type == PackType.AddShow)
+                {
+                    IoTMcuMain.Show.Start();
+                }
+                IoTMcuMain.IsBoot.Reset();
+            }
+            socket.Send(SocketPack.ResPack);
+            WriteLock.Reset();
         }
     }
 }

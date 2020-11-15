@@ -67,9 +67,9 @@ namespace IoTMcu
         private void LastReceiveCallBack(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
-            Socket handler = state.workSocket;
-
-            int bytesRead = handler.EndReceive(ar);
+            Socket ThisSocket = state.workSocket;
+            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(LastReceiveCallBack), state);
+            int bytesRead = ThisSocket.EndReceive(ar);
             if (bytesRead > 0)
             {
                 if (Check(state.buffer))
@@ -78,13 +78,13 @@ namespace IoTMcu
                     temp = temp.Trim();
                 }
             }
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(LastReceiveCallBack), state);
         }
         private void NextReceiveCallBack(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
-            Socket handler = state.workSocket;
-            int bytesRead = handler.EndReceive(ar);
+            Socket ThisSocket = state.workSocket;
+            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(NextReceiveCallBack), state);
+            int bytesRead = ThisSocket.EndReceive(ar);
             if (bytesRead > 0)
             {
                 if (Check(state.buffer))
@@ -107,7 +107,7 @@ namespace IoTMcu
                                     name = obj.Data,
                                     local = FontSave.Local + obj.Data,
                                     size = obj.Data2,
-                                    socket = handler,
+                                    socket = ThisSocket,
                                     type = PackType.AddFont
                                 });
                             }
@@ -124,21 +124,24 @@ namespace IoTMcu
                                     name = obj.Data,
                                     local = ShowSave.Local + obj.Data,
                                     size = obj.Data2,
-                                    socket = handler,
+                                    socket = ThisSocket,
                                     type = PackType.AddShow
                                 });
                             }
                             break;
+                        case PackType.DeleteFont:
+                            IoTMcuMain.Font.RemoveFont(obj.Data, ThisSocket);
+                            break;
                     }
                 }
             }
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(NextReceiveCallBack), state);
         }
         private void ServerReceiveCallBack(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
-            Socket handler = state.workSocket;
-            int bytesRead = handler.EndReceive(ar);
+            Socket ThisSocket = state.workSocket;
+            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ServerReceiveCallBack), state);
+            int bytesRead = ThisSocket.EndReceive(ar);
             if (bytesRead > 0)
             {
                 if (CheckServer(state.buffer))
@@ -147,16 +150,15 @@ namespace IoTMcu
                     temp = temp.Trim();
                 }
             }
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ServerReceiveCallBack), state);
         }
         public void StartLast()
         {
             try
             {
-                IPAddress ipAddress = IPAddress.Parse(IoTMcuMain.Config.LastSocket.IP);
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, IoTMcuMain.Config.LastSocket.Port);
+                //IPAddress ipAddress = IPAddress.Parse(IoTMcuMain.Config.LastSocket.IP);
+                //IPEndPoint localEndPoint = new IPEndPoint(ipAddress, IoTMcuMain.Config.LastSocket.Port);
                 LastSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                LastSocket.Connect(localEndPoint);
+                LastSocket.Connect(IoTMcuMain.Config.LastSocket.IP, IoTMcuMain.Config.LastSocket.Port);
                 LastSocket.BeginReceive(LastPackObj.buffer, 0, StateObject.BufferSize,
                     SocketFlags.None, new AsyncCallback(LastReceiveCallBack), LastPackObj);
                 Logs.Log("上一个设备已连接");
@@ -188,10 +190,10 @@ namespace IoTMcu
         {
             try
             {
-                IPAddress ipAddress = IPAddress.Parse(IoTMcuMain.Config.LastSocket.IP);
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, IoTMcuMain.Config.LastSocket.Port);
+                //IPAddress ipAddress = IPAddress.Parse(IoTMcuMain.Config.LastSocket.IP);
+                //IPEndPoint localEndPoint = new IPEndPoint(ipAddress, IoTMcuMain.Config.LastSocket.Port);
                 ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                ServerSocket.Connect(localEndPoint);
+                ServerSocket.Connect(IoTMcuMain.Config.LastSocket.IP, IoTMcuMain.Config.LastSocket.Port);
                 ServerSocket.BeginReceive(ServerPackObj.buffer, 0, StateObject.BufferSize,
                     SocketFlags.None, new AsyncCallback(LastReceiveCallBack), ServerPackObj);
                 Logs.Log("IoT服务器已连接");
@@ -203,19 +205,19 @@ namespace IoTMcu
         }
         public SocketIoT()
         {
-            StartLast();
-            StartNext();
-            StartServer();
+            //StartLast();
+            //StartNext();
+            //StartServer();
         }
 
-        public void SendNext(string data)
+        public static void SendNext(string data, Socket socket)
         {
             var pack = Encoding.UTF8.GetBytes("      " + data);
             for (int i = 0; i < 6; i++)
             {
                 pack[i] = SocketPack.ThisPack[i];
             }
-            NextSocket?.Send(pack);
+            socket.Send(pack);
         }
         public void SendServer(string data)
         {

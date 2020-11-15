@@ -6,21 +6,19 @@ namespace IoTMcu
 {
     class HC595
     {
-        private const int MRES = 10;
-        private const int MCLK = 10;
-        private const int MLOCK = 10;
-        private const int MOUT = 10;
-        private const int M1RED = 10;
-        private const int M2RED = 10;
-        private const int M1BLU = 10;
-        private const int M2BLU = 10;
+        private const int MRES = 198;
+        private const int MCLK = 6;
+        private const int MLOCK = 1;
+        private const int M1RED = 12;
+        private const int M2RED = 199;
+        private const int M1BLU = 11;
+        private const int M2BLU = 7;
 
         public HC595()
         {
             IoTMcuMain.GpioController.OpenPin(MRES, PinMode.Output);
             IoTMcuMain.GpioController.OpenPin(MCLK, PinMode.Output);
             IoTMcuMain.GpioController.OpenPin(MLOCK, PinMode.Output);
-            IoTMcuMain.GpioController.OpenPin(MOUT, PinMode.Output);
             IoTMcuMain.GpioController.OpenPin(M1RED, PinMode.Output);
             IoTMcuMain.GpioController.OpenPin(M2RED, PinMode.Output);
             IoTMcuMain.GpioController.OpenPin(M1BLU, PinMode.Output);
@@ -41,7 +39,7 @@ namespace IoTMcu
 
         public static void SetOut(bool val)
         {
-            IoTMcuMain.GpioController.Write(MOUT, val ? PinValue.Low : PinValue.High);
+            HC138.SetEnable(val);
         }
         public static void SetDate(PinValue[] data1, PinValue[] data2,
             PinValue[] data3, PinValue[] data4, int size, bool both = true)
