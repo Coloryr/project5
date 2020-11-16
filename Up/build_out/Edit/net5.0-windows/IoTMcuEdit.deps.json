@@ -1,0 +1,91 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "IoTMcuEdit/1.0.0": {
+        "dependencies": {
+          "Costura.Fody": "4.1.0",
+          "Fody": "6.3.0",
+          "NotifyIconWpf": "1.0.0"
+        },
+        "runtime": {
+          "IoTMcuEdit.dll": {}
+        }
+      },
+      "Costura.Fody/4.1.0": {},
+      "Fody/6.3.0": {},
+      "Microsoft.NETCore.Platforms/2.0.0": {},
+      "Microsoft.NETCore.Targets/2.0.0": {},
+      "Microsoft.WindowsDesktop.App/3.0.0-alpha-27128-4": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.0",
+          "Microsoft.NETCore.Targets": "2.0.0"
+        }
+      },
+      "NotifyIconWpf/1.0.0": {
+        "dependencies": {
+          "Microsoft.WindowsDesktop.App": "3.0.0-alpha-27128-4"
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/NotifyIconWpf.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "IoTMcuEdit/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Costura.Fody/4.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-MkW5aqhqNvuP6MiaaD5Yx8efXv+5ucsumRx+Nsn5b+PA4RnaxJLtXhGkm1N+Hi7sjkSlL8kl1klSS/7v2DxZHw==",
+      "path": "costura.fody/4.1.0",
+      "hashPath": "costura.fody.4.1.0.nupkg.sha512"
+    },
+    "Fody/6.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kBGlW/vBUvBSyCvFI3YICNl77gjUr0KMROlBTeBPN/+J3JMU57w1dpXPwjmU4ahdBTYLomzgxKLaJ3jVNuXuQg==",
+      "path": "fody/6.3.0",
+      "hashPath": "fody.6.3.0.nupkg.sha512"
+    },
+    "Microsoft.NETCore.Platforms/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VdLJOCXhZaEMY7Hm2GKiULmn7IEPFE4XC5LPSfBVCUIA8YLZVh846gtfBJalsPQF2PlzdD7ecX7DZEulJ402ZQ==",
+      "path": "microsoft.netcore.platforms/2.0.0",
+      "hashPath": "microsoft.netcore.platforms.2.0.0.nupkg.sha512"
+    },
+    "Microsoft.NETCore.Targets/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-odP/tJj1z6GylFpNo7pMtbd/xQgTC3Ex2If63dRTL38bBNMwsBnJ+RceUIyHdRBC0oik/3NehYT+oECwBhIM3Q==",
+      "path": "microsoft.netcore.targets/2.0.0",
+      "hashPath": "microsoft.netcore.targets.2.0.0.nupkg.sha512"
+    },
+    "Microsoft.WindowsDesktop.App/3.0.0-alpha-27128-4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7PHuXgMY3wvuOtpFXhUUySkYLV3e7Y7EBYxBlGAnk/1thvwFOO+Y0wuKGkzp8m1C/Fq87j3hmeYW+QwuIKemAA==",
+      "path": "microsoft.windowsdesktop.app/3.0.0-alpha-27128-4",
+      "hashPath": "microsoft.windowsdesktop.app.3.0.0-alpha-27128-4.nupkg.sha512"
+    },
+    "NotifyIconWpf/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-w2qIVUkMEXhfkG442DYkCCMjo44SWophamOcJf82A4OHr8qhjwduX7ZyWKk1baZrfsVIRZcPR+UlHSrlV/UAEQ==",
+      "path": "notifyiconwpf/1.0.0",
+      "hashPath": "notifyiconwpf.1.0.0.nupkg.sha512"
+    }
+  }
+}

@@ -7,10 +7,10 @@ namespace IoTMcu
 {
     class IoTMcuMain
     {
-        public static readonly GpioController GpioController = new GpioController();
+        public static readonly GpioController GpioController = new();
 
         public static string Local;
-        public static ManualResetEvent IsBoot = new ManualResetEvent(false);
+        public static ManualResetEvent IsBoot = new(false);
 
         public static ConfigObj Config;
         public static SocketIoT SocketIoT;

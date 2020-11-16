@@ -1,10 +1,10 @@
 ﻿using Lib;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 
 namespace IoTMcu
 {
@@ -91,7 +91,7 @@ namespace IoTMcu
                 {
                     string temp = Encoding.UTF8.GetString(state.buffer);
                     temp = temp.Trim();
-                    var obj = JsonConvert.DeserializeObject<IoTPackObj>(temp);
+                    var obj = JsonSerializer.Deserialize<IoTPackObj>(temp);
                     var data = Convert.FromBase64String(obj.Data1);
                     switch (obj.Type)
                     {

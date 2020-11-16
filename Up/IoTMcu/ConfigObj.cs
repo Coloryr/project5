@@ -24,6 +24,7 @@ namespace IoTMcu
     }
     public class ShowObj
     {
+        public int Index { get; set; }
         public ShowType Type { get; set; }
         public string FontName { get; set; }
         public int FontSize { get; set; }

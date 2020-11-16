@@ -94,7 +94,7 @@ namespace IoTMcu
                 var temp = ConfigRead.Read<ShowObj>(item.FullName, null);
                 if (temp != null)
                 {
-                    ShowList.Add(temp);
+                    ShowList.Add(temp.Index, temp);
                 }
             }
             if (ShowImg != null)
