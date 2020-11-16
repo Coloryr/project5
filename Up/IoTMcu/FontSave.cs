@@ -23,9 +23,9 @@ namespace IoTMcu
         }
         public static readonly Dictionary<SelfColor, Brush> BrushesSave = new()
         {
-            { SelfColor.RED, Brushes.Red},
-            { SelfColor.BULE, Brushes.Blue},
-            { SelfColor.MIX, Brushes.Orange}
+            { SelfColor.RED, Brushes.Red },
+            { SelfColor.BULE, Brushes.Blue },
+            { SelfColor.MIX, Brushes.Orange }
         };
     }
     public class FontSave
