@@ -92,6 +92,7 @@ namespace IoTMcu
                     string temp = Encoding.UTF8.GetString(state.buffer);
                     temp = temp.Trim();
                     var obj = JsonSerializer.Deserialize<IoTPackObj>(temp);
+                    var pack = new IoTPackObj();
                     var data = Convert.FromBase64String(obj.Data1);
                     switch (obj.Type)
                     {
@@ -106,7 +107,7 @@ namespace IoTMcu
                                 {
                                     name = obj.Data,
                                     local = FontSave.Local + obj.Data,
-                                    size = obj.Data2,
+                                    size = obj.Data3,
                                     socket = ThisSocket,
                                     type = PackType.AddFont
                                 });
@@ -123,7 +124,7 @@ namespace IoTMcu
                                 {
                                     name = obj.Data,
                                     local = ShowSave.Local + obj.Data,
-                                    size = obj.Data2,
+                                    size = obj.Data3,
                                     socket = ThisSocket,
                                     type = PackType.AddShow
                                 });
@@ -131,6 +132,16 @@ namespace IoTMcu
                             break;
                         case PackType.DeleteFont:
                             IoTMcuMain.Font.RemoveFont(obj.Data, ThisSocket);
+                            break;
+                        case PackType.Info:
+                            pack.Data = IoTMcuMain.Config.Name;
+                            pack.Data3 = IoTMcuMain.Config.Width;
+                            pack.Data4 = IoTMcuMain.Config.Height;
+                            var list = IoTMcuMain.Font.FontList.Keys;
+                            var list1 = IoTMcuMain.Show.ShowList.Values;
+                            pack.Data1 = JsonSerializer.Serialize(list);
+                            pack.Data2 = JsonSerializer.Serialize(list1);
+                            SendNext(pack, ThisSocket);
                             break;
                     }
                 }
@@ -210,8 +221,9 @@ namespace IoTMcu
             //StartServer();
         }
 
-        public static void SendNext(string data, Socket socket)
+        public static void SendNext(object obj, Socket socket)
         {
+            var data = JsonSerializer.Serialize(obj);
             var pack = Encoding.UTF8.GetBytes("      " + data);
             for (int i = 0; i < 6; i++)
             {

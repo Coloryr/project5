@@ -2,6 +2,7 @@
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -9,22 +10,33 @@ namespace IoTMcuEdit
 {
     class SocketUtils
     {
-        private Socket socket;
-        private bool IsConnect;
-        private delegate void CloseEvent();
-        private CloseEvent CloseCall;
-
-        public SocketUtils(Action action)
+        class StateObject
         {
-            CloseCall = new CloseEvent(action);
+            public Socket workSocket = null;
+            public const int BufferSize = 8196;
+            public byte[] buffer = new byte[BufferSize];
         }
-        public bool Check(byte[] data)
+        public bool IsConnect { get; private set; }
+        private StateObject LastPackObj = new();
+        private readonly Socket socket = new(SocketType.Stream, ProtocolType.Tcp);
+        private delegate void CallEvent(bool state);
+        private delegate void DataEvent(string data);
+        private CallEvent ConnectCall;
+        private DataEvent DataCall;
+
+        public SocketUtils(Action<bool> action, Action<string> action1)
+        {
+            ConnectCall = new CallEvent(action);
+            DataCall = new DataEvent(action1);
+            LastPackObj.workSocket = socket;
+        }
+        public static bool Check(byte[] data)
         {
             for (int i = 0; i < 6; i++)
             {
                 if (data[i] != SocketPack.ThisPack[i])
                 {
-                    App.Show("错误", "数据包错误");
+                    App.ShowB("错误", "数据包错误");
                     return false;
                 }
                 else
@@ -36,9 +48,29 @@ namespace IoTMcuEdit
         }
         private void ShutDown()
         {
-            socket.Shutdown(SocketShutdown.Both);
-            socket.Close();
-            socket.Dispose();
+            if(socket.Connected)
+            {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+                socket.Dispose();
+            }
+        }
+        private void ReceiveCallBack(IAsyncResult ar)
+        {
+            StateObject state = (StateObject)ar.AsyncState;
+            Socket ThisSocket = state.workSocket;
+            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, 
+                new AsyncCallback(ReceiveCallBack), state);
+            int bytesRead = ThisSocket.EndReceive(ar);
+            if (bytesRead > 0)
+            {
+                if (Check(state.buffer))
+                {
+                    string temp = Encoding.UTF8.GetString(state.buffer);
+                    temp = temp.Trim();
+                    DataCall.Invoke(temp);
+                }
+            }
         }
         public async void SetConnect(string ip, int port)
         {
@@ -52,7 +84,14 @@ namespace IoTMcuEdit
                 try
                 {
                     socket.Connect(ip, port);
+                    socket.BeginReceive(LastPackObj.buffer, 0, StateObject.BufferSize,
+                    SocketFlags.None, new AsyncCallback(ReceiveCallBack), LastPackObj);
                     IsConnect = true;
+                    ConnectCall.Invoke(IsConnect);
+                    SendNext(new IoTPackObj
+                    {
+                        Type = PackType.Info
+                    });
                 }
                 catch (Exception e)
                 {
@@ -61,8 +100,9 @@ namespace IoTMcuEdit
             });
         }
 
-        public void SendNext(string data)
+        public void SendNext(object obj)
         {
+            var data = JsonSerializer.Serialize(obj);
             var pack = Encoding.UTF8.GetBytes("      " + data);
             for (int i = 0; i < 6; i++)
             {
@@ -74,7 +114,7 @@ namespace IoTMcuEdit
             }
             catch (Exception e)
             {
-                App.Show("连接错误", e.ToString());
+                App.ShowB("连接错误", e.ToString());
                 Close();
             }
         }
@@ -82,7 +122,7 @@ namespace IoTMcuEdit
         {
             IsConnect = false;
             ShutDown();
-            CloseCall.Invoke();
+            ConnectCall.Invoke(IsConnect);
         }
         public void Scan()
         {

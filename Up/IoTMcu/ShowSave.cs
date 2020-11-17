@@ -12,7 +12,7 @@ namespace IoTMcu
 
         public static Bitmap ShowImg;
 
-        private readonly Dictionary<int, ShowObj> ShowList = new();
+        public readonly Dictionary<int, ShowObj> ShowList = new();
         private readonly List<PinValue[]> ShowRedTemp = new();
         private readonly List<PinValue[]> ShowBulTemp = new();
 
