@@ -16,12 +16,14 @@ namespace IoTMcu
         public static SocketIoT SocketIoT;
         public static ShowSave Show;
         public static FontSave Font;
+
+        public const string ConfigName = "config.json";
         static void Main()
         {
             Logs.Log("Mcu Start");
             Local = AppDomain.CurrentDomain.BaseDirectory;
             Logs.Log("Read Config");
-            Config = ConfigRead.Read("config.json", new ConfigObj
+            Config = ConfigRead.Read(ConfigName, new ConfigObj
             {
                 FontList = new List<FontSave>(),
                 LastSocket = new SocketSave

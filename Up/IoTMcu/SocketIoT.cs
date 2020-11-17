@@ -134,6 +134,7 @@ namespace IoTMcu
                             IoTMcuMain.Font.RemoveFont(obj.Data, ThisSocket);
                             break;
                         case PackType.Info:
+                            pack.Type = PackType.Info;
                             pack.Data = IoTMcuMain.Config.Name;
                             pack.Data3 = IoTMcuMain.Config.Width;
                             pack.Data4 = IoTMcuMain.Config.Height;
@@ -141,6 +142,24 @@ namespace IoTMcu
                             var list1 = IoTMcuMain.Show.ShowList.Values;
                             pack.Data1 = JsonSerializer.Serialize(list);
                             pack.Data2 = JsonSerializer.Serialize(list1);
+                            SendNext(pack, ThisSocket);
+                            break;
+                        case PackType.SetInfo:
+                            IoTMcuMain.Config.Name = obj.Data;
+                            IoTMcuMain.Config.Width = obj.Data3;
+                            IoTMcuMain.Config.Height = pack.Data4;
+                            ConfigRead.Write(IoTMcuMain.Config, IoTMcuMain.ConfigName);
+                            break;
+                        case PackType.ListFont:
+                            pack.Type = PackType.ListFont;
+                            list = IoTMcuMain.Font.FontList.Keys;
+                            pack.Data = JsonSerializer.Serialize(list);
+                            SendNext(pack, ThisSocket);
+                            break;
+                        case PackType.ListShow:
+                            pack.Type = PackType.ListShow;
+                            list1 = IoTMcuMain.Show.ShowList.Values;
+                            pack.Data = JsonSerializer.Serialize(list1);
                             SendNext(pack, ThisSocket);
                             break;
                     }

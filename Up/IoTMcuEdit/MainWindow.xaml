@@ -38,7 +38,7 @@
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="154,4,0,0" TextWrapping="Wrap" Text="{Binding LcdObj.Y}"
                          VerticalAlignment="Top" Width="64"/>
                 <Button Content="设置" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="144,50,0,0" 
-                        Height="18" Name="屏幕设置"/>
+                        Height="18" Name="屏幕设置" Click="LcdSet_Click"/>
                 <Label Content="名字" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,22,0,0"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="34,0,0,0" TextWrapping="Wrap" Text="{Binding LcdObj.Name}"
                          VerticalAlignment="Center" Width="184"/>
@@ -60,7 +60,7 @@
                     </ListView.ContextMenu>
                 </ListView>
                 <Button Content="刷新" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,147,0,0"
-                        Height="18" Name="字体刷新"/>
+                        Height="18" Name="字体刷新" Click="FontReload_Click"/>
             </Grid>
         </GroupBox>
         <GroupBox x:Name="lock3" Header="显示列表" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Width="214" Margin="462,10,0,0">
@@ -82,7 +82,7 @@
                         </ContextMenu>
                     </ListView.ContextMenu>
                 </ListView>
-                <Button Content="刷新" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,252,0,0" Height="18"/>
+                <Button Content="刷新" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,252,0,0" Height="18" Click="ShowReload_Click"/>
                 <Button Content="设置" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="53,252,0,0" Height="18"/>
             </Grid>
         </GroupBox>

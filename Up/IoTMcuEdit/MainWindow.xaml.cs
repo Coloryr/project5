@@ -102,6 +102,27 @@ namespace IoTMcuEdit
                     }
                     App.ShowA("屏幕", "配置已读取");
                     break;
+                case PackType.AddFont:
+
+                    break;
+                case PackType.ListFont:
+                    list = JsonSerializer.Deserialize<List<string>>(obj.Data);
+                    FontList.Clear();
+                    foreach (var item in list)
+                    {
+                        FontList.Add(item);
+                    }
+                    App.ShowA("屏幕", "字体已读取");
+                    break;
+                case PackType.ListShow:
+                    list1 = JsonSerializer.Deserialize<List<ShowObj>>(obj.Data);
+                    ShowList.Clear();
+                    foreach (var item in list1)
+                    {
+                        ShowList.Add(item);
+                    }
+                    App.ShowA("屏幕", "显示已读取");
+                    break;
             }
         }
         private void SocketState(bool state)
@@ -236,6 +257,44 @@ namespace IoTMcuEdit
         {
             SocketUtils.Close();
             notifyIcon.Dispose();
+        }
+
+        private void LcdSet_Click(object sender, RoutedEventArgs e)
+        {
+            if (LcdObj.X % 8 != 0 || LcdObj.Y % 8 != 0)
+            {
+                App.ShowB("屏幕", "尺寸错误");
+                return;
+            }
+            var pack = new IoTPackObj
+            {
+                Type = PackType.SetInfo,
+                Data = LcdObj.Name,
+                Data3 = LcdObj.X,
+                Data4 = LcdObj.Y
+            };
+            SocketUtils.SendNext(pack);
+            App.ShowA("屏幕", "参数已设置");
+        }
+
+        private void FontReload_Click(object sender, RoutedEventArgs e)
+        {
+            var pack = new IoTPackObj
+            {
+                Type = PackType.ListFont
+            };
+            SocketUtils.SendNext(pack);
+            App.ShowA("屏幕", "刷新字体");
+        }
+
+        private void ShowReload_Click(object sender, RoutedEventArgs e)
+        {
+            var pack = new IoTPackObj
+            {
+                Type = PackType.ListShow
+            };
+            SocketUtils.SendNext(pack);
+            App.ShowA("屏幕", "刷新显示");
         }
     }
 }

@@ -8,20 +8,26 @@ namespace IoTMcu
 {
     class DownloadFile
     {
-        private ManualResetEvent WriteLock = new(false);
+        private readonly ManualResetEvent WriteLock = new(false);
         private FileStream FileStream;
+        private IoTPackObj Pack;
 
         public string name;
         public string local;
         public Socket socket;
         public long size;
         public PackType type;
-
+        
         public void Start()
         {
             IoTMcuMain.IsBoot.Set();
             Thread.Sleep(20);
             FileStream = File.OpenWrite(local);
+            Pack = new()
+            {
+                Type = type,
+                Data = "ok"
+            };
         }
 
         public async void Write(byte[] data)
@@ -45,7 +51,7 @@ namespace IoTMcu
                 }
                 IoTMcuMain.IsBoot.Reset();
             }
-            socket.Send(SocketPack.ResPack);
+            SocketIoT.SendNext(Pack, socket);
             WriteLock.Reset();
         }
     }
