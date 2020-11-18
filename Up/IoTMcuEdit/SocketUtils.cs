@@ -32,7 +32,7 @@ namespace IoTMcuEdit
         }
         public static bool Check(byte[] data)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (data[i] != SocketPack.ThisPack[i])
                 {
@@ -100,22 +100,24 @@ namespace IoTMcuEdit
             });
         }
 
-        public void SendNext(object obj)
+        public bool SendNext(object obj)
         {
             var data = JsonSerializer.Serialize(obj);
-            var pack = Encoding.UTF8.GetBytes("      " + data);
-            for (int i = 0; i < 6; i++)
+            var pack = Encoding.UTF8.GetBytes("     " + data);
+            for (int i = 0; i < 5; i++)
             {
                 pack[i] = SocketPack.ThisPack[i];
             }
             try
             {
                 socket.Send(pack);
+                return true;
             }
             catch (Exception e)
             {
                 App.ShowB("连接错误", e.ToString());
                 Close();
+                return false;
             }
         }
         public void Close()

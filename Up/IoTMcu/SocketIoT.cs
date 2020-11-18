@@ -33,7 +33,7 @@ namespace IoTMcu
 
         public static bool Check(byte[] data)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (data[i] != SocketPack.ThisPack[i])
                 {
@@ -49,7 +49,7 @@ namespace IoTMcu
         }
         public static bool CheckServer(byte[] data)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (data[i] != SocketPack.ThisPack[i])
                 {
@@ -93,12 +93,13 @@ namespace IoTMcu
                     temp = temp.Trim();
                     var obj = JsonSerializer.Deserialize<IoTPackObj>(temp);
                     var pack = new IoTPackObj();
-                    var data = Convert.FromBase64String(obj.Data1);
+                    
                     switch (obj.Type)
                     {
                         case PackType.AddFont:
                             if (DownloadTasks.ContainsKey(obj.Data))
                             {
+                                var data = Convert.FromBase64String(obj.Data1);
                                 DownloadTasks[obj.Data].Write(data);
                             }
                             else
@@ -113,22 +114,12 @@ namespace IoTMcu
                                 });
                             }
                             break;
-                        case PackType.AddShow:
-                            if (DownloadTasks.ContainsKey(obj.Data))
-                            {
-                                DownloadTasks[obj.Data].Write(data);
-                            }
-                            else
-                            {
-                                DownloadTasks.Add(obj.Data, new DownloadFile
-                                {
-                                    name = obj.Data,
-                                    local = ShowSave.Local + obj.Data,
-                                    size = obj.Data3,
-                                    socket = ThisSocket,
-                                    type = PackType.AddShow
-                                });
-                            }
+                        case PackType.SetShow:
+                            IoTMcuMain.Show.SetShow(obj.Data);
+                            SendNext(new IoTPackObj()
+                            { 
+                                Type = PackType.SetShow
+                            }, ThisSocket);
                             break;
                         case PackType.DeleteFont:
                             IoTMcuMain.Font.RemoveFont(obj.Data, ThisSocket);
@@ -243,8 +234,8 @@ namespace IoTMcu
         public static void SendNext(object obj, Socket socket)
         {
             var data = JsonSerializer.Serialize(obj);
-            var pack = Encoding.UTF8.GetBytes("      " + data);
-            for (int i = 0; i < 6; i++)
+            var pack = Encoding.UTF8.GetBytes("     " + data);
+            for (int i = 0; i < 5; i++)
             {
                 pack[i] = SocketPack.ThisPack[i];
             }
@@ -252,8 +243,8 @@ namespace IoTMcu
         }
         public void SendServer(string data)
         {
-            var pack = Encoding.UTF8.GetBytes("      " + data);
-            for (int i = 0; i < 6; i++)
+            var pack = Encoding.UTF8.GetBytes("     " + data);
+            for (int i = 0; i < 5; i++)
             {
                 pack[i] = SocketPack.ReadPack[i];
             }
@@ -261,8 +252,8 @@ namespace IoTMcu
         }
         public void SendLast(string data)
         {
-            var pack = Encoding.UTF8.GetBytes("      " + data);
-            for (int i = 0; i < 6; i++)
+            var pack = Encoding.UTF8.GetBytes("     " + data);
+            for (int i = 0; i < 5; i++)
             {
                 pack[i] = SocketPack.ThisPack[i];
             }

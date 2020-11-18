@@ -37,7 +37,7 @@
                          VerticalAlignment="Top" Width="64"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="154,4,0,0" TextWrapping="Wrap" Text="{Binding LcdObj.Y}"
                          VerticalAlignment="Top" Width="64"/>
-                <Button Content="设置" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="144,50,0,0" 
+                <Button Content="设置屏幕" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="144,50,0,0" 
                         Height="18" Name="屏幕设置" Click="LcdSet_Click"/>
                 <Label Content="名字" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,22,0,0"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="34,0,0,0" TextWrapping="Wrap" Text="{Binding LcdObj.Name}"
@@ -59,7 +59,7 @@
                         </ContextMenu>
                     </ListView.ContextMenu>
                 </ListView>
-                <Button Content="刷新" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,147,0,0"
+                <Button Content="刷新字体" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,147,0,0"
                         Height="18" Name="字体刷新" Click="FontReload_Click"/>
             </Grid>
         </GroupBox>
@@ -82,13 +82,13 @@
                         </ContextMenu>
                     </ListView.ContextMenu>
                 </ListView>
-                <Button Content="刷新" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,252,0,0" Height="18" Click="ShowReload_Click"/>
-                <Button Content="设置" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="53,252,0,0" Height="18"/>
+                <Button Content="刷新显示" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,252,0,0" Height="18" Click="ShowReload_Click"/>
+                <Button Content="设置显示" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="53,252,0,0" Height="18" Click="SetShow_Click"/>
             </Grid>
         </GroupBox>
         <GroupBox x:Name="lock4" Header="显示修改" HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="447" Margin="10,210,0,0">
             <Grid>
-                <Button Content="设置" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="363,54,0,0" Height="18" Click="Setting_Click"/>
+                <Button Content="设置内容" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="363,54,0,0" Height="18" Click="Setting_Click"/>
                 <Label Content="名字" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="34,4,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Name,Mode=TwoWay}"
                          VerticalAlignment="Top" Width="79"/>

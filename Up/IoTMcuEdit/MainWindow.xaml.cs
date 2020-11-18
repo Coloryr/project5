@@ -4,10 +4,12 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using System.Text.Json;
+using Microsoft.Win32;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Lib;
 using System.Collections.Generic;
+using System.IO;
 
 namespace IoTMcuEdit
 {
@@ -19,6 +21,9 @@ namespace IoTMcuEdit
         public System.Windows.Forms.NotifyIcon notifyIcon;
         private SocketUtils SocketUtils;
         private int index;
+        private OpenFileDialog openFileDialog = new();
+
+        private Dictionary<string, DownloadFile> DownloadTasks = new();
         public ObservableCollection<string> FontList { get; set; } = new();
         public ObservableCollection<ShowObj> ShowList { get; set; } = new();
         public ShowObj TempShowObj { get; set; } = new();
@@ -78,6 +83,11 @@ namespace IoTMcuEdit
 
             SocketState(true);
         }
+        public void TaskDone(string name)
+        {
+            if (DownloadTasks.ContainsKey(name))
+                DownloadTasks.Remove(name);
+        }
         private void SocketData(string data)
         {
             var obj = JsonSerializer.Deserialize<IoTPackObj>(data);
@@ -103,7 +113,10 @@ namespace IoTMcuEdit
                     App.ShowA("屏幕", "配置已读取");
                     break;
                 case PackType.AddFont:
-
+                    if (DownloadTasks.ContainsKey(obj.Data))
+                    {
+                        DownloadTasks[obj.Data].Send();
+                    }
                     break;
                 case PackType.ListFont:
                     list = JsonSerializer.Deserialize<List<string>>(obj.Data);
@@ -122,6 +135,9 @@ namespace IoTMcuEdit
                         ShowList.Add(item);
                     }
                     App.ShowA("屏幕", "显示已读取");
+                    break;
+                case PackType.SetShow:
+                    App.ShowA("显示", "显示内容已设置");
                     break;
             }
         }
@@ -174,10 +190,39 @@ namespace IoTMcuEdit
         }
         private void AddFont(object sender, RoutedEventArgs e)
         {
-
+            openFileDialog.Title = "系统文字文件";
+            openFileDialog.Filter = "ttf文字|*.ttf";
+            openFileDialog.FileName = string.Empty;
+            openFileDialog.FilterIndex = 1;
+            openFileDialog.Multiselect = false;
+            openFileDialog.RestoreDirectory = true;
+            openFileDialog.DefaultExt = "ttf";
+            if (openFileDialog.ShowDialog() == false)
+            {
+                return;
+            }
+            FileInfo info = new FileInfo(openFileDialog.FileName);
+            if (DownloadTasks.ContainsKey(info.Name))
+            {
+                App.ShowB("字体", "这个字体正在上传");
+                return;
+            }
+            var file = new DownloadFile()
+            {
+                local = info.FullName,
+                name = info.Name,
+                SocketUtils = SocketUtils,
+                type = PackType.AddFont
+            };
+            file.Start();
+            DownloadTasks.Add(info.Name, file);
+            App.ShowA("字体", "正在上传字体" + info.Name);
         }
         private void DeleteFont(object sender, RoutedEventArgs e)
         {
+            if (显示列表.SelectedItem == null)
+                return;
+            index = 显示列表.SelectedIndex;
 
         }
         private void AddShow(object sender, RoutedEventArgs e)
@@ -295,6 +340,17 @@ namespace IoTMcuEdit
             };
             SocketUtils.SendNext(pack);
             App.ShowA("屏幕", "刷新显示");
+        }
+
+        private void SetShow_Click(object sender, RoutedEventArgs e)
+        {
+            var pack = new IoTPackObj
+            {
+                Type = PackType.SetShow,
+                Data = JsonSerializer.Serialize(ShowList)
+            };
+            SocketUtils.SendNext(pack);
+            App.ShowA("显示", "正在设置显示内容");
         }
     }
 }

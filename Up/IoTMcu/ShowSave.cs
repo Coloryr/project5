@@ -2,6 +2,7 @@
 using System.Device.Gpio;
 using System.Drawing;
 using System.IO;
+using System.Text.Json;
 using System.Threading;
 
 namespace IoTMcu
@@ -76,14 +77,6 @@ namespace IoTMcu
                     Thread.Sleep(100);
                 }
             });
-            Start();
-            ShowThread = new Thread(StartShow);
-            ShowThread.Start();
-            UpdateThread.Start();
-        }
-
-        public void Start()
-        {
             if (!Directory.Exists(Local))
             {
                 Directory.CreateDirectory(Local);
@@ -91,12 +84,35 @@ namespace IoTMcu
             var list = new DirectoryInfo(Local);
             foreach (var item in list.GetFiles())
             {
-                var temp = ConfigRead.Read<ShowObj>(item.FullName, null);
+                var temp = JsonSerializer.Deserialize<ShowObj>(File.ReadAllText(item.FullName));
                 if (temp != null)
                 {
                     ShowList.Add(temp.Index, temp);
                 }
             }
+            Start();
+            ShowThread = new Thread(StartShow);
+            ShowThread.Start();
+            UpdateThread.Start();
+        }
+        public void SetShow(string data)
+        {
+            List<ShowObj> list = JsonSerializer.Deserialize<List<ShowObj>>(data);
+            var list1 = new DirectoryInfo(Local);
+            foreach (var item in list1.GetFiles())
+            {
+                File.Delete(item.FullName);
+            }
+            ShowList.Clear();
+            foreach (var item in list)
+            {
+                ShowList.Add(item.Index, item);
+                var str = JsonSerializer.Serialize(item);
+                File.WriteAllText(Local + item.Name + ".json", str);
+            }
+        }
+        public void Start()
+        {
             if (ShowImg != null)
             {
                 ShowImg.Dispose();

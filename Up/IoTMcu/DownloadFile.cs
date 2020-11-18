@@ -17,7 +17,7 @@ namespace IoTMcu
         public Socket socket;
         public long size;
         public PackType type;
-        
+
         public void Start()
         {
             IoTMcuMain.IsBoot.Set();
@@ -41,14 +41,7 @@ namespace IoTMcu
             {
                 await FileStream.DisposeAsync();
                 IoTMcuMain.SocketIoT.TaskDone(name);
-                if (type == PackType.AddFont)
-                {
-                    IoTMcuMain.Font.Start();
-                }
-                else if (type == PackType.AddShow)
-                {
-                    IoTMcuMain.Show.Start();
-                }
+                IoTMcuMain.Font.Start();
                 IoTMcuMain.IsBoot.Reset();
             }
             SocketIoT.SendNext(Pack, socket);
