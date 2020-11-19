@@ -93,7 +93,7 @@ namespace IoTMcu
                     temp = temp.Trim();
                     var obj = JsonSerializer.Deserialize<IoTPackObj>(temp);
                     var pack = new IoTPackObj();
-                    
+
                     switch (obj.Type)
                     {
                         case PackType.AddFont:
@@ -117,7 +117,7 @@ namespace IoTMcu
                         case PackType.SetShow:
                             IoTMcuMain.Show.SetShow(obj.Data);
                             SendNext(new IoTPackObj()
-                            { 
+                            {
                                 Type = PackType.SetShow
                             }, ThisSocket);
                             break;

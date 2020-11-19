@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Data;
-using System.Text.Json;
+﻿using Lib;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Lib;
-using System.Collections.Generic;
-using System.IO;
 
 namespace IoTMcuEdit
 {
@@ -143,9 +141,9 @@ namespace IoTMcuEdit
                     App.ShowA("显示", "显示内容已设置");
                     break;
                 case PackType.DeleteFont:
-                    if(obj.Data == "ok")
+                    if (obj.Data == "ok")
                         App.ShowA("字体", "字体已删除");
-                    else if(obj.Data == "no")
+                    else if (obj.Data == "no")
                         App.ShowB("字体", "字体删除失败");
                     else
                         App.ShowB("字体", "其他错误");

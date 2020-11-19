@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Lib;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
-using Lib;
 using System.Net.Sockets;
 
 namespace IoTMcu
@@ -99,8 +99,8 @@ namespace IoTMcu
             }
             else
             {
-                SocketIoT.SendNext(new IoTPackObj 
-                { 
+                SocketIoT.SendNext(new IoTPackObj
+                {
                     Type = PackType.DeleteFont,
                     Data = "no"
                 }, socket);
