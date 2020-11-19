@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
+using Lib;
 using System.Net.Sockets;
 
 namespace IoTMcu
@@ -90,11 +91,19 @@ namespace IoTMcu
             {
                 FontList[data].Dispose();
                 FontList.Remove(data);
-                SocketIoT.SendNext("ok", socket);
+                SocketIoT.SendNext(new IoTPackObj
+                {
+                    Type = PackType.DeleteFont,
+                    Data = "ok"
+                }, socket);
             }
             else
             {
-                SocketIoT.SendNext("no", socket);
+                SocketIoT.SendNext(new IoTPackObj 
+                { 
+                    Type = PackType.DeleteFont,
+                    Data = "no"
+                }, socket);
             }
         }
     }

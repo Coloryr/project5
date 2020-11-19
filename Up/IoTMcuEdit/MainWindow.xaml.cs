@@ -86,7 +86,10 @@ namespace IoTMcuEdit
         public void TaskDone(string name)
         {
             if (DownloadTasks.ContainsKey(name))
+            {
                 DownloadTasks.Remove(name);
+                Dispatcher.Invoke(() => FontReload_Click(null, null));
+            }
         }
         private void SocketData(string data)
         {
@@ -138,6 +141,14 @@ namespace IoTMcuEdit
                     break;
                 case PackType.SetShow:
                     App.ShowA("显示", "显示内容已设置");
+                    break;
+                case PackType.DeleteFont:
+                    if(obj.Data == "ok")
+                        App.ShowA("字体", "字体已删除");
+                    else if(obj.Data == "no")
+                        App.ShowB("字体", "字体删除失败");
+                    else
+                        App.ShowB("字体", "其他错误");
                     break;
             }
         }
@@ -222,8 +233,14 @@ namespace IoTMcuEdit
         {
             if (显示列表.SelectedItem == null)
                 return;
-            index = 显示列表.SelectedIndex;
-
+            var name = (string)显示列表.SelectedItem;
+            var pack = new IoTPackObj
+            {
+                Type = PackType.DeleteFont,
+                Data = name
+            };
+            SocketUtils.SendNext(pack);
+            App.ShowA("字体", "删除字体" + name);
         }
         private void AddShow(object sender, RoutedEventArgs e)
         {
