@@ -48,7 +48,7 @@ namespace IoTMcuEdit
         }
         private void ShutDown()
         {
-            if(socket.Connected)
+            if (socket.Connected)
             {
                 socket.Shutdown(SocketShutdown.Both);
                 socket.Close();
@@ -59,7 +59,7 @@ namespace IoTMcuEdit
         {
             StateObject state = (StateObject)ar.AsyncState;
             Socket ThisSocket = state.workSocket;
-            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, 
+            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReceiveCallBack), state);
             int bytesRead = ThisSocket.EndReceive(ar);
             if (bytesRead > 0)
