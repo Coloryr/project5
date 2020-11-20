@@ -230,7 +230,7 @@ namespace IoTMcu
         public SocketIoT()
         {
             //StartLast();
-            //StartNext();
+            StartNext();
             //StartServer();
         }
 
