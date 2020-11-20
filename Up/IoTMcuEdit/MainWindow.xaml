@@ -114,7 +114,7 @@
                 </Grid>
                 <Label Content="字体样式" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="261,0,0,0"/>
                 <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="118" Margin="319,0,0,0"
-                          Height="20" IsReadOnly="True"/>
+                          Height="20" IsReadOnly="True" Name="字体样式" SelectionChanged="字体样式_SelectionChanged"/>
                 <Label Content="显示内容" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,50,0,0"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="58,54,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Text}"
                          VerticalAlignment="Top" Width="300"/>

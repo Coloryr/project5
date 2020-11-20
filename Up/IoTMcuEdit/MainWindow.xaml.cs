@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -63,6 +64,7 @@ namespace IoTMcuEdit
             SocketUtils = new SocketUtils(SocketState, SocketData);
 
             字体列表.ItemsSource = FontList;
+            字体样式.ItemsSource = FontList;
             显示列表.ItemsSource = ShowList;
 
             ShowList.Add(new ShowObj());
@@ -257,6 +259,7 @@ namespace IoTMcuEdit
                 return;
             index = 显示列表.SelectedIndex;
             var data = (ShowObj)显示列表.SelectedItem;
+            字体样式.SelectedItem = data.FontType;
             data.Bind(TempShowObj);
             App.ShowA(data.Name, "正在修改");
         }
@@ -366,6 +369,13 @@ namespace IoTMcuEdit
             };
             SocketUtils.SendNext(pack);
             App.ShowA("显示", "正在设置显示内容");
+        }
+
+        private void 字体样式_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (字体样式.SelectedItem == null)
+                return;
+            TempShowObj.FontType = (string)字体样式.SelectedItem;
         }
     }
 }

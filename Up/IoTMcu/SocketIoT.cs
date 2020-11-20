@@ -123,6 +123,9 @@ namespace IoTMcu
                             break;
                         case PackType.DeleteFont:
                             IoTMcuMain.Font.RemoveFont(obj.Data, ThisSocket);
+                            pack.Type = PackType.DeleteFont;
+                            pack.Data = obj.Data;
+                            SendNext(pack, ThisSocket);
                             break;
                         case PackType.Info:
                             pack.Type = PackType.Info;
