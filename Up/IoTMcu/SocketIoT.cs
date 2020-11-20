@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using Newtonsoft.Json;
 using System.Text;
-using System.Text.Json;
+using System.Threading;
 
 namespace IoTMcu
 {
@@ -20,9 +21,9 @@ namespace IoTMcu
         private Socket LastSocket;
         private Socket ServerSocket;
 
-        private readonly StateObject LastPackObj = new();
-        private readonly StateObject NextPackObj = new();
-        private readonly StateObject ServerPackObj = new();
+        private Thread ServerThread;
+
+        private bool RunFlag;
 
         private Dictionary<string, DownloadFile> DownloadTasks = new();
 
@@ -81,83 +82,103 @@ namespace IoTMcu
         }
         private void NextReceiveCallBack(IAsyncResult ar)
         {
-            StateObject state = (StateObject)ar.AsyncState;
-            Socket ThisSocket = state.workSocket;
-            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(NextReceiveCallBack), state);
-            int bytesRead = ThisSocket.EndReceive(ar);
-            if (bytesRead > 0)
+            try
             {
-                if (Check(state.buffer))
+                StateObject state = (StateObject)ar.AsyncState;
+                Socket ThisSocket = state.workSocket;
+                var nextpack = new StateObject
                 {
-                    string temp = Encoding.UTF8.GetString(state.buffer);
-                    temp = temp.Trim();
-                    var obj = JsonSerializer.Deserialize<IoTPackObj>(temp);
-                    var pack = new IoTPackObj();
-
-                    switch (obj.Type)
+                    workSocket = ThisSocket
+                };
+                ThisSocket.BeginReceive(nextpack.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(NextReceiveCallBack), nextpack);
+                int bytesRead = ThisSocket.EndReceive(ar);
+                if (bytesRead > 0)
+                {
+                    if (Check(state.buffer))
                     {
-                        case PackType.AddFont:
-                            if (DownloadTasks.ContainsKey(obj.Data))
-                            {
-                                var data = Convert.FromBase64String(obj.Data1);
-                                DownloadTasks[obj.Data].Write(data);
-                            }
-                            else
-                            {
-                                DownloadTasks.Add(obj.Data, new DownloadFile
+                        string temp = Encoding.UTF8.GetString(state.buffer);
+                        temp = temp[5..];
+                        Console.WriteLine(temp);
+                        var obj = JsonConvert.DeserializeObject<IoTPackObj>(temp);
+                        var pack = new IoTPackObj();
+
+                        switch (obj.Type)
+                        {
+                            case PackType.AddFont:
+                                if (DownloadTasks.ContainsKey(obj.Data))
                                 {
-                                    name = obj.Data,
-                                    local = FontSave.Local + obj.Data,
-                                    size = obj.Data3,
-                                    socket = ThisSocket,
-                                    type = PackType.AddFont
-                                });
-                            }
-                            break;
-                        case PackType.SetShow:
-                            IoTMcuMain.Show.SetShow(obj.Data);
-                            SendNext(new IoTPackObj()
-                            {
-                                Type = PackType.SetShow
-                            }, ThisSocket);
-                            break;
-                        case PackType.DeleteFont:
-                            IoTMcuMain.Font.RemoveFont(obj.Data, ThisSocket);
-                            pack.Type = PackType.DeleteFont;
-                            pack.Data = obj.Data;
-                            SendNext(pack, ThisSocket);
-                            break;
-                        case PackType.Info:
-                            pack.Type = PackType.Info;
-                            pack.Data = IoTMcuMain.Config.Name;
-                            pack.Data3 = IoTMcuMain.Config.Width;
-                            pack.Data4 = IoTMcuMain.Config.Height;
-                            var list = IoTMcuMain.Font.FontList.Keys;
-                            var list1 = IoTMcuMain.Show.ShowList.Values;
-                            pack.Data1 = JsonSerializer.Serialize(list);
-                            pack.Data2 = JsonSerializer.Serialize(list1);
-                            SendNext(pack, ThisSocket);
-                            break;
-                        case PackType.SetInfo:
-                            IoTMcuMain.Config.Name = obj.Data;
-                            IoTMcuMain.Config.Width = obj.Data3;
-                            IoTMcuMain.Config.Height = pack.Data4;
-                            ConfigRead.Write(IoTMcuMain.Config, IoTMcuMain.ConfigName);
-                            break;
-                        case PackType.ListFont:
-                            pack.Type = PackType.ListFont;
-                            list = IoTMcuMain.Font.FontList.Keys;
-                            pack.Data = JsonSerializer.Serialize(list);
-                            SendNext(pack, ThisSocket);
-                            break;
-                        case PackType.ListShow:
-                            pack.Type = PackType.ListShow;
-                            list1 = IoTMcuMain.Show.ShowList.Values;
-                            pack.Data = JsonSerializer.Serialize(list1);
-                            SendNext(pack, ThisSocket);
-                            break;
+                                    Logs.Log($"收到字体{obj.Data}数据包");
+                                    var data = Convert.FromBase64String(obj.Data1);
+                                    DownloadTasks[obj.Data].Write(data);
+                                }
+                                else
+                                {
+                                    var Task = new DownloadFile
+                                    {
+                                        name = obj.Data,
+                                        local = FontSave.Local + obj.Data,
+                                        size = obj.Data3,
+                                        socket = ThisSocket,
+                                        type = PackType.AddFont
+                                    };
+                                    DownloadTasks.Add(obj.Data, Task);
+                                    Task.Start();
+                                }
+                                break;
+                            case PackType.SetShow:
+                                IoTMcuMain.Show.SetShow(obj.Data);
+                                SendNext(new IoTPackObj()
+                                {
+                                    Type = PackType.SetShow
+                                }, ThisSocket);
+                                break;
+                            case PackType.DeleteFont:
+                                IoTMcuMain.Font.RemoveFont(obj.Data, ThisSocket);
+                                pack.Type = PackType.DeleteFont;
+                                pack.Data = obj.Data;
+                                SendNext(pack, ThisSocket);
+                                break;
+                            case PackType.Info:
+                                pack.Type = PackType.Info;
+                                pack.Data = IoTMcuMain.Config.Name;
+                                pack.Data3 = IoTMcuMain.Config.Width;
+                                pack.Data4 = IoTMcuMain.Config.Height;
+                                var list = IoTMcuMain.Font.FontList.Keys;
+                                var list1 = IoTMcuMain.Show.ShowList.Values;
+                                pack.Data1 = JsonConvert.SerializeObject(list);
+                                pack.Data2 = JsonConvert.SerializeObject(list1);
+                                SendNext(pack, ThisSocket);
+                                break;
+                            case PackType.SetInfo:
+                                IoTMcuMain.Config.Name = obj.Data;
+                                IoTMcuMain.Config.Width = obj.Data3;
+                                IoTMcuMain.Config.Height = obj.Data4;
+                                ConfigRead.Write(IoTMcuMain.Config, IoTMcuMain.ConfigName);
+                                break;
+                            case PackType.ListFont:
+                                pack.Type = PackType.ListFont;
+                                list = IoTMcuMain.Font.FontList.Keys;
+                                pack.Data = JsonConvert.SerializeObject(list);
+                                SendNext(pack, ThisSocket);
+                                break;
+                            case PackType.ListShow:
+                                pack.Type = PackType.ListShow;
+                                list1 = IoTMcuMain.Show.ShowList.Values;
+                                pack.Data = JsonConvert.SerializeObject(list1);
+                                SendNext(pack, ThisSocket);
+                                break;
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Logs.Error(e);
+                foreach (var item in DownloadTasks)
+                {
+                    item.Value.Close();
+                }
+                DownloadTasks.Clear();
             }
         }
         private void ServerReceiveCallBack(IAsyncResult ar)
@@ -183,6 +204,10 @@ namespace IoTMcu
                 //IPEndPoint localEndPoint = new IPEndPoint(ipAddress, IoTMcuMain.Config.LastSocket.Port);
                 LastSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 LastSocket.Connect(IoTMcuMain.Config.LastSocket.IP, IoTMcuMain.Config.LastSocket.Port);
+                var LastPackObj = new StateObject
+                {
+                    workSocket = LastSocket
+                };
                 LastSocket.BeginReceive(LastPackObj.buffer, 0, StateObject.BufferSize,
                     SocketFlags.None, new AsyncCallback(LastReceiveCallBack), LastPackObj);
                 Logs.Log("上一个设备已连接");
@@ -192,17 +217,41 @@ namespace IoTMcu
                 Logs.Error(e, "上一个设备链接失败");
             }
         }
+        private void NextListenClientConnect()
+        {
+            try
+            {
+                while (RunFlag)
+                {
+                    Socket clientScoket = NextSocket.Accept();
+                    var NextPackObj = new StateObject
+                    {
+                        workSocket = clientScoket
+                    };
+                    clientScoket.BeginReceive(NextPackObj.buffer, 0, StateObject.BufferSize,
+                    SocketFlags.None, new AsyncCallback(NextReceiveCallBack), NextPackObj);
+                }
+            }
+            catch (Exception e)
+            {
+                Logs.Error(e);
+                return;
+            }
+        }
         public void StartNext()
         {
             try
             {
-                IPAddress ipAddress = IPAddress.Parse(IoTMcuMain.Config.LastSocket.IP);
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, IoTMcuMain.Config.LastSocket.Port);
+                IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, IoTMcuMain.Config.LastSocket.Port);
                 NextSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 NextSocket.Bind(localEndPoint);
                 NextSocket.Listen(5);
-                NextSocket.BeginReceive(NextPackObj.buffer, 0, StateObject.BufferSize,
-                    SocketFlags.None, new AsyncCallback(NextReceiveCallBack), NextPackObj);
+
+                ServerThread = new Thread(NextListenClientConnect);
+                ServerThread.Start();
+
+                RunFlag = true;
+
                 Logs.Log("下一个设备已准备");
             }
             catch (Exception e)
@@ -214,10 +263,13 @@ namespace IoTMcu
         {
             try
             {
-                //IPAddress ipAddress = IPAddress.Parse(IoTMcuMain.Config.LastSocket.IP);
-                //IPEndPoint localEndPoint = new IPEndPoint(ipAddress, IoTMcuMain.Config.LastSocket.Port);
+                IPEndPoint localEndPoint = new IPEndPoint(IPAddress.None, IoTMcuMain.Config.LastSocket.Port);
                 ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                ServerSocket.Connect(IoTMcuMain.Config.LastSocket.IP, IoTMcuMain.Config.LastSocket.Port);
+                ServerSocket.Connect(localEndPoint);
+                var ServerPackObj = new StateObject
+                { 
+                    workSocket = ServerSocket
+                };
                 ServerSocket.BeginReceive(ServerPackObj.buffer, 0, StateObject.BufferSize,
                     SocketFlags.None, new AsyncCallback(LastReceiveCallBack), ServerPackObj);
                 Logs.Log("IoT服务器已连接");
@@ -234,9 +286,18 @@ namespace IoTMcu
             //StartServer();
         }
 
+        public void Stop()
+        {
+            RunFlag = false;
+            if (NextSocket != null)
+            {
+                NextSocket.Dispose();
+            }
+        }
+
         public static void SendNext(object obj, Socket socket)
         {
-            var data = JsonSerializer.Serialize(obj);
+            var data = JsonConvert.SerializeObject(obj);
             var pack = Encoding.UTF8.GetBytes("     " + data);
             for (int i = 0; i < 5; i++)
             {

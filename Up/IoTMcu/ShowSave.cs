@@ -9,7 +9,7 @@ namespace IoTMcu
 {
     class ShowSave
     {
-        public static readonly string Local = IoTMcuMain.Local + "ShowList\\";
+        public static readonly string Local = IoTMcuMain.Local + "ShowList/";
 
         public static Bitmap ShowImg;
 
@@ -32,10 +32,9 @@ namespace IoTMcu
 
         public ShowSave()
         {
-            ColorConverter ColorConverter = new();
-            Red = (Color)ColorConverter.ConvertFromString(Brushes.Red.ToString());
-            Blue = (Color)ColorConverter.ConvertFromString(Brushes.Blue.ToString());
-            Mix = (Color)ColorConverter.ConvertFromString(Brushes.Orange.ToString());
+            Red = Color.Red;
+            Blue = Color.Blue;
+            Mix = Color.Orange;
 
             UpdateThread = new Thread(() =>
             {
@@ -45,11 +44,11 @@ namespace IoTMcu
                     var show = IoTMcuMain.Show.ShowList[showindex];
                     if (updata)
                     {
-                        for (int i = 0; i < IoTMcuMain.Config.Width; i++)
+                        for (int i = 0; i < IoTMcuMain.Config.Height; i++)
                         {
-                            for (int j = 0; j < IoTMcuMain.Config.Height; j++)
+                            for (int j = 0; j < IoTMcuMain.Config.Width; j++)
                             {
-                                var temp = ShowImg.GetPixel(i, j);
+                                var temp = ShowImg.GetPixel(j, i);
                                 if (temp == Red)
                                 {
                                     ShowRedTemp[i][j] = PinValue.Low;
@@ -108,7 +107,7 @@ namespace IoTMcu
             {
                 ShowList.Add(item.Index, item);
                 var str = JsonSerializer.Serialize(item);
-                File.WriteAllText(Local + item.Name + ".json", str);
+                File.WriteAllText(Local + item.Index + ".json", str);
             }
         }
         public void Start()
@@ -126,7 +125,7 @@ namespace IoTMcu
             }
             for (int i = 0; i < IoTMcuMain.Config.Height; i++)
             {
-                for (int j = 0; j < IoTMcuMain.Config.Width; i++)
+                for (int j = 0; j < IoTMcuMain.Config.Width; j++)
                 {
                     ShowRedTemp[i][j] = PinValue.High;
                     ShowBulTemp[i][j] = PinValue.High;

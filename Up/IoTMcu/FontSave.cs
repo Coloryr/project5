@@ -31,7 +31,7 @@ namespace IoTMcu
     }
     public class FontSave
     {
-        public static readonly string Local = IoTMcuMain.Local + "Font\\";
+        public static readonly string Local = IoTMcuMain.Local + "Font/";
 
         public readonly Dictionary<string, Font> FontList = new();
 

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -29,7 +29,7 @@ namespace IoTMcuEdit
         public LcdObj LcdObj { get; set; } = new()
         {
             IP = "192.168.0.100",
-            Port = 25555,
+            Port = 50000,
             Name = "LCD1",
             X = 32,
             Y = 16
@@ -81,7 +81,7 @@ namespace IoTMcuEdit
             StateLable.Content = "未连接";
             StateLed.Fill = Brushes.Red;
 
-            SocketState(true);
+            //SocketState(true);
         }
         public void TaskDone(string name)
         {
@@ -93,7 +93,7 @@ namespace IoTMcuEdit
         }
         private void SocketData(string data)
         {
-            var obj = JsonSerializer.Deserialize<IoTPackObj>(data);
+            var obj = JsonConvert.DeserializeObject<IoTPackObj>(data);
             switch (obj.Type)
             {
                 case PackType.Info:
@@ -101,18 +101,24 @@ namespace IoTMcuEdit
                     LcdObj.X = obj.Data3;
                     LcdObj.Y = obj.Data4;
 
-                    var list = JsonSerializer.Deserialize<List<string>>(obj.Data1);
-                    FontList.Clear();
-                    foreach (var item in list)
+                    var list = JsonConvert.DeserializeObject<List<string>>(obj.Data1);
+                    Dispatcher.Invoke(() =>
                     {
-                        FontList.Add(item);
-                    }
-                    var list1 = JsonSerializer.Deserialize<List<ShowObj>>(obj.Data1);
-                    ShowList.Clear();
-                    foreach (var item in list1)
+                        FontList.Clear();
+                        foreach (var item in list)
+                        {
+                            FontList.Add(item);
+                        }
+                    });
+                    var list1 = JsonConvert.DeserializeObject<List<ShowObj>>(obj.Data2);
+                    Dispatcher.Invoke(() =>
                     {
-                        ShowList.Add(item);
-                    }
+                        ShowList.Clear();
+                        foreach (var item in list1)
+                        {
+                            ShowList.Add(item);
+                        }
+                    });
                     App.ShowA("屏幕", "配置已读取");
                     break;
                 case PackType.AddFont:
@@ -122,7 +128,7 @@ namespace IoTMcuEdit
                     }
                     break;
                 case PackType.ListFont:
-                    list = JsonSerializer.Deserialize<List<string>>(obj.Data);
+                    list = JsonConvert.DeserializeObject<List<string>>(obj.Data);
                     FontList.Clear();
                     foreach (var item in list)
                     {
@@ -131,7 +137,7 @@ namespace IoTMcuEdit
                     App.ShowA("屏幕", "字体已读取");
                     break;
                 case PackType.ListShow:
-                    list1 = JsonSerializer.Deserialize<List<ShowObj>>(obj.Data);
+                    list1 = JsonConvert.DeserializeObject<List<ShowObj>>(obj.Data);
                     ShowList.Clear();
                     foreach (var item in list1)
                     {
@@ -170,6 +176,11 @@ namespace IoTMcuEdit
                 }
                 else
                 {
+                    foreach(var item in DownloadTasks)
+                    {
+                        item.Value.Close();    
+                    }
+                    DownloadTasks.Clear();
                     lock1.IsEnabled =
                     lock2.IsEnabled =
                     lock3.IsEnabled =
@@ -365,7 +376,7 @@ namespace IoTMcuEdit
             var pack = new IoTPackObj
             {
                 Type = PackType.SetShow,
-                Data = JsonSerializer.Serialize(ShowList)
+                Data = JsonConvert.SerializeObject(ShowList)
             };
             SocketUtils.SendNext(pack);
             App.ShowA("显示", "正在设置显示内容");

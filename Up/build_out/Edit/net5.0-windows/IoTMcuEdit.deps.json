@@ -10,6 +10,7 @@
         "dependencies": {
           "Costura.Fody": "4.1.0",
           "Fody": "6.3.0",
+          "Newtonsoft.Json": "12.0.3",
           "NotifyIconWpf": "1.0.0"
         },
         "runtime": {
@@ -24,6 +25,14 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "2.0.0",
           "Microsoft.NETCore.Targets": "2.0.0"
+        }
+      },
+      "Newtonsoft.Json/12.0.3": {
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.3.23909"
+          }
         }
       },
       "NotifyIconWpf/1.0.0": {
@@ -79,6 +88,13 @@
       "sha512": "sha512-7PHuXgMY3wvuOtpFXhUUySkYLV3e7Y7EBYxBlGAnk/1thvwFOO+Y0wuKGkzp8m1C/Fq87j3hmeYW+QwuIKemAA==",
       "path": "microsoft.windowsdesktop.app/3.0.0-alpha-27128-4",
       "hashPath": "microsoft.windowsdesktop.app.3.0.0-alpha-27128-4.nupkg.sha512"
+    },
+    "Newtonsoft.Json/12.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg==",
+      "path": "newtonsoft.json/12.0.3",
+      "hashPath": "newtonsoft.json.12.0.3.nupkg.sha512"
     },
     "NotifyIconWpf/1.0.0": {
       "type": "package",

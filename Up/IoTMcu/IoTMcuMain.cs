@@ -10,7 +10,7 @@ namespace IoTMcu
         public static readonly GpioController GpioController = new();
 
         public static string Local;
-        public static ManualResetEvent IsBoot = new(false);
+        public static ManualResetEvent IsBoot = new(true);
 
         public static ConfigObj Config;
         public static SocketIoT SocketIoT;
@@ -29,12 +29,11 @@ namespace IoTMcu
                 LastSocket = new SocketSave
                 {
                     IP = "192.168.1.1",
-                    Port = 600
+                    Port = 50000
                 },
                 NextSocket = new SocketSave
                 {
-                    IP = "0.0.0.0",
-                    Port = 600
+                    Port = 50000
                 },
                 ServerSocket = new SocketSave
                 {

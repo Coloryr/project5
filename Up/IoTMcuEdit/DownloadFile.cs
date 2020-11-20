@@ -7,7 +7,7 @@ namespace IoTMcuEdit
 {
     class DownloadFile
     {
-        private readonly ManualResetEvent WriteLock = new(false);
+        private readonly ManualResetEvent WriteLock = new(true);
         private IoTPackObj Pack;
         private byte[] Data;
         private int size;
@@ -39,11 +39,11 @@ namespace IoTMcuEdit
         public void Send()
         {
             WriteLock.WaitOne();
-            WriteLock.Set();
-            var data = new byte[8196];
-            if (size > 8196)
+            WriteLock.Reset();
+            var data = new byte[800];
+            if (size > 800)
             {
-                down = 8196;
+                down = 800;
             }
             else
             {
@@ -58,7 +58,13 @@ namespace IoTMcuEdit
                 App.MainWindow_.TaskDone(name);
             }
             size -= down;
-            WriteLock.Reset();
+            now += 800;
+            WriteLock.Set();
+        }
+
+        public void Close()
+        {
+            WriteLock.Dispose();
         }
     }
 }
