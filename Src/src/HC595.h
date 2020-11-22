@@ -4,27 +4,18 @@
 #include <stdio.h>
 
 //74HC595
-#define MRES 36
-#define MOUT 35
+#define MLOCK 19
+#define MCLK 5
+#define MRES 17
+#define M1RED 22
+#define M1BLU 23
+#define M2RED 21
+#define M2BLU 18
 
-#define MRCLK 39
-#define MRLOCK 34
-#define M1RED 27
-#define M2RED 14
-#define M3RED 12
-#define M4RED 13
-
-#define MBCLK 8
-#define MBLOCK 7
-#define M1BLU 9
-#define M2BLU 10
-#define M3BLU 11
-#define M4BLU 15
-
-void Init();
+void HC595Init();
 void Reset();
-void SetOut(uint8_t out);
-void SetRData(uint8_t *data1, uint8_t *data2, uint8_t *data3, uint8_t *data4, uint16_t size);
-void SetBData(uint8_t *data1, uint8_t *data2, uint8_t *data3, uint8_t *data4, uint16_t size);
+void UnLock();
+void SetDataA(uint8_t *data1, uint8_t *data2, uint16_t size);
+void SetDataB(uint8_t *data1, uint8_t *data2,uint8_t *data3, uint8_t *data4, uint16_t size);
 
 #endif

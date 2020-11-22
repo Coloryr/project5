@@ -1,26 +1,22 @@
 #ifndef HC138_h
 #define HC138_h
 
-#include <Arduino.h>
+#include <stdio.h>
 
 //74HC138
-#define A0 32
-#define A1 33
-#define A2 25
-#define AEN 26
-class HC138
-{
-private:
-    uint8_t local;
-    void SetPin();
-public:
-    HC138();
-    void Init();
-    void SetEnable(bool enable);
-    void AddPos();
-    void SetPos(uint8_t pos);
-};
+#define A0 2
+#define A1 4
+#define A2 13
+#define A3 16
+#define AEN 15
 
-extern class HC138 HC138;
+extern uint8_t local;
+
+void HC138Init();
+void SetPin();
+void SetEnable(uint8_t enable);
+void AddPos();
+void ReSetPos();
+void SetPos(uint8_t pos);
 
 #endif

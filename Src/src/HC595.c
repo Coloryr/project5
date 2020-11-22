@@ -1,79 +1,78 @@
 #include <stdio.h>
 #include <HC595.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+#include "sdkconfig.h"
 
-void Init()
+void HC595Init()
 {
-    // pinMode(MRES, OUTPUT);
-    // pinMode(MRCLK, OUTPUT);
-    // pinMode(MRLOCK, OUTPUT);
-    // pinMode(MBCLK, OUTPUT);
-    // pinMode(MBLOCK, OUTPUT);
-    // pinMode(MOUT, OUTPUT);
-    // pinMode(M1RED, OUTPUT);
-    // pinMode(M2RED, OUTPUT);
-    // pinMode(M3RED, OUTPUT);
-    // pinMode(M4RED, OUTPUT);
-    // pinMode(M1BLU, OUTPUT);
-    // pinMode(M2BLU, OUTPUT);
-    // pinMode(M3BLU, OUTPUT);
-    // pinMode(M4BLU, OUTPUT);
+    gpio_pad_select_gpio(MRES);
+    gpio_pad_select_gpio(MLOCK);
+    gpio_pad_select_gpio(MCLK);
+    gpio_pad_select_gpio(M1RED);
+    gpio_pad_select_gpio(M1BLU);
+    gpio_pad_select_gpio(M2RED);
+    gpio_pad_select_gpio(M2BLU);
 
-    // digitalWrite(MRES, LOW);
-    // digitalWrite(MBCLK, LOW);
-    // digitalWrite(MRCLK, LOW);
-    // delay(10);
-    // digitalWrite(MRES, HIGH);
+    gpio_set_direction(MRES, GPIO_MODE_OUTPUT);
+    gpio_set_direction(MLOCK, GPIO_MODE_OUTPUT);
+    gpio_set_direction(MCLK, GPIO_MODE_OUTPUT);
+    gpio_set_direction(M1RED, GPIO_MODE_OUTPUT);
+    gpio_set_direction(M1BLU, GPIO_MODE_OUTPUT);
+    gpio_set_direction(M2RED, GPIO_MODE_OUTPUT);
+    gpio_set_direction(M2BLU, GPIO_MODE_OUTPUT);
+
+    gpio_set_level(MRES, 1);
+    gpio_set_level(MLOCK, 0);
+    gpio_set_level(MCLK, 0);
+    gpio_set_level(M1RED, 1);
+    gpio_set_level(M1BLU, 1);
+    gpio_set_level(M2RED, 1);
+    gpio_set_level(M2BLU, 1);
+
+    Reset();
 }
 
 void Reset()
 {
-    // digitalWrite(MRES, LOW);
-    // delay(10);
-    // digitalWrite(MRES, HIGH);
+    gpio_set_level(MRES, 0);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
+    gpio_set_level(MRES, 1);
 }
 
-void SetOut(bool out)
+void UnLock()
 {
-    // digitalWrite(MOUT, out ? LOW : HIGH);
+    gpio_set_level(MLOCK, 1);
+    ets_delay_us(10);
+    gpio_set_level(MLOCK, 0);
 }
 
-void SetRData(uint8_t *data1, uint8_t *data2, uint8_t *data3, uint8_t *data4, uint16_t size)
+void SetDataA(uint8_t *data1, uint8_t *data2, uint16_t size)
 {
     uint8_t i;
     uint16_t local;
     uint8_t data_1;
     uint8_t data_2;
-    uint8_t data_3;
-    uint8_t data_4;
 
     for (local = 0; local < size; local++)
     {
         data_1 = data1[local];
         data_2 = data2[local];
-        data_3 = data3[local];
-        data_4 = data4[local];
         for (i = 0; i < 8; i++)
         {
-            // digitalWrite(M1RED, data_1);
-            // digitalWrite(M2RED, data_2);
-            // digitalWrite(M3RED, data_3);
-            // digitalWrite(M4RED, data_4);
-            // data_1 <<= 1;
-            // data_2 <<= 1;
-            // data_3 <<= 1;
-            // data_4 <<= 1;
-            // digitalWrite(MRCLK, LOW);
-            // delayMicroseconds(10);
-            // digitalWrite(MRCLK, HIGH);
+            gpio_set_level(M1RED, data_1);
+            gpio_set_level(M1BLU, data_2);
+            data_1 <<= 1;
+            data_2 <<= 1;
+            gpio_set_level(MCLK, 1);
+            ets_delay_us(10);
+            gpio_set_level(MCLK, 0);
         }
-
-        // digitalWrite(MRLOCK, HIGH);
-        // delayMicroseconds(10);
-        // digitalWrite(MRLOCK, LOW);
     }
 }
 
-void SetBData(uint8_t *data1, uint8_t *data2, uint8_t *data3, uint8_t *data4, uint16_t size)
+void SetDataB(uint8_t *data1, uint8_t *data2,uint8_t *data3, uint8_t *data4, uint16_t size)
 {
     uint8_t i;
     uint16_t local;
@@ -81,7 +80,6 @@ void SetBData(uint8_t *data1, uint8_t *data2, uint8_t *data3, uint8_t *data4, ui
     uint8_t data_2;
     uint8_t data_3;
     uint8_t data_4;
-
     for (local = 0; local < size; local++)
     {
         data_1 = data1[local];
@@ -90,21 +88,17 @@ void SetBData(uint8_t *data1, uint8_t *data2, uint8_t *data3, uint8_t *data4, ui
         data_4 = data4[local];
         for (i = 0; i < 8; i++)
         {
-            // digitalWrite(M1BLU, data_1);
-            // digitalWrite(M2BLU, data_2);
-            // digitalWrite(M3BLU, data_3);
-            // digitalWrite(M4BLU, data_4);
-            // data_1 <<= 1;
-            // data_2 <<= 1;
-            // data_3 <<= 1;
-            // data_4 <<= 1;
-            // digitalWrite(MBCLK, LOW);
-            // delayMicroseconds(10);
-            // digitalWrite(MBCLK, HIGH);
+            gpio_set_level(M1RED, data_1);
+            gpio_set_level(M1BLU, data_2);
+            gpio_set_level(M2RED, data_3);
+            gpio_set_level(M2BLU, data_4);
+            data_1 <<= 1;
+            data_2 <<= 1;
+            data_3 <<= 1;
+            data_4 <<= 1;
+            gpio_set_level(MCLK, 1);
+            ets_delay_us(10);
+            gpio_set_level(MCLK, 0);
         }
-
-        // digitalWrite(MBLOCK, HIGH);
-        // delayMicroseconds(10);
-        // digitalWrite(MBLOCK, LOW);
     }
 }

@@ -1,45 +1,64 @@
 #include <stdio.h>
 #include <HC138.h>
+#include "driver/gpio.h"
+#include "sdkconfig.h"
 
-void Init()
+uint8_t local;
+
+void HC138Init()
 {
-    // pinMode(A0, OUTPUT);
-    // pinMode(A1, OUTPUT);
-    // pinMode(A2, OUTPUT);
-    // pinMode(AEN, OUTPUT);
+    gpio_pad_select_gpio(A0);
+    gpio_pad_select_gpio(A1);
+    gpio_pad_select_gpio(A2);
+    gpio_pad_select_gpio(A3);
+    gpio_pad_select_gpio(AEN);
+
+    gpio_set_direction(A0, GPIO_MODE_OUTPUT);
+    gpio_set_direction(A1, GPIO_MODE_OUTPUT);
+    gpio_set_direction(A2, GPIO_MODE_OUTPUT);
+    gpio_set_direction(A3, GPIO_MODE_OUTPUT);
+    gpio_set_direction(AEN, GPIO_MODE_OUTPUT);
+
+    gpio_set_level(A0, 1);
+    gpio_set_level(A1, 1);
+    gpio_set_level(A2, 1);
+    gpio_set_level(A3, 1);
+    gpio_set_level(AEN, 1);
 
     local = 0;
-
-    // digitalWrite(AEN, HIGH);
-    // digitalWrite(A0, HIGH);
-    // digitalWrite(A1, HIGH);
-    // digitalWrite(A2, HIGH);
 }
 
 void SetPin()
 {
-    // digitalWrite(A0, local & 0x01);
-    // digitalWrite(A1, local & 0x02);
-    // digitalWrite(A2, local & 0x04);
+    gpio_set_level(A0, local & 0x01);
+    gpio_set_level(A1, local & 0x02);
+    gpio_set_level(A2, local & 0x04);
+    gpio_set_level(A3, local & 0x08);
 }
 
-void SetEnable(bool enable)
+void SetEnable(uint8_t enable)
 {
-    // digitalWrite(AEN, enable ? LOW : HIGH);
+    gpio_set_level(AEN, enable);
 }
 
 void AddPos()
 {
-    if (local >= 7)
+    if (local >= 15)
         local = 0;
     else
         local++;
     SetPin();
 }
 
+void ReSetPos()
+{
+    local = 0;
+    SetPin();
+}
+
 void SetPos(uint8_t pos)
 {
-    if (pos > 7)
+    if(pos > 15)
         return;
     local = pos;
     SetPin();
