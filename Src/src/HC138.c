@@ -31,9 +31,9 @@ void HC138Init()
 void SetPin()
 {
     gpio_set_level(A0, local & 0x01);
-    gpio_set_level(A1, local & 0x02);
-    gpio_set_level(A2, local & 0x04);
-    gpio_set_level(A3, local & 0x08);
+    gpio_set_level(A1, (local & 0x02) >> 1);
+    gpio_set_level(A2, (local & 0x04) >> 2);
+    gpio_set_level(A3, (local & 0x08) >> 3);
 }
 
 void SetEnable(uint8_t enable)
@@ -58,7 +58,7 @@ void ReSetPos()
 
 void SetPos(uint8_t pos)
 {
-    if(pos > 15)
+    if (pos > 15)
         return;
     local = pos;
     SetPin();

@@ -2,15 +2,27 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "sdkconfig.h"
+#include "esp_task_wdt.h"
 #include "TaskShow.h"
 #include "DataSave.h"
 #include "HC138.h"
 #include "HC595.h"
 
+void test()
+{
+    for (uint8_t i = 0; i < Height; i++)
+    {
+        REDData[i] = 0x00;
+        BULData[i] = 0xff;
+    }
+}
+
 void TaskShow(void *data)
 {
     uint8_t y;
     printf("开始显示\n");
+    test();
+    SetEnable(0);
     for (;;)
     {
         if (CanRun)
@@ -28,17 +40,17 @@ void TaskShow(void *data)
                     SetDataA(REDData[Height], BULData[Height], Width);
                 }
 
-                SetEnable(1);
                 AddPos();
                 UnLock();
-                SetEnable(0);
+                // SetEnable(1);
+                // esp_task_wdt_reset();
                 vTaskDelay(5 / portTICK_PERIOD_MS);
             }
         }
         else
         {
-            vTaskDelay(20 / portTICK_PERIOD_MS);
+            SetEnable(1);
+            vTaskDelay(50 / portTICK_PERIOD_MS);
         }
-        
     }
 }
