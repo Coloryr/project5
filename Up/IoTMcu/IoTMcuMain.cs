@@ -16,6 +16,7 @@ namespace IoTMcu
         public static SocketIoT SocketIoT;
         public static ShowSave Show;
         public static FontSave Font;
+        public static UartUtils UartUtils;
 
         public const string ConfigName = "config.json";
         static void Main()
@@ -46,9 +47,7 @@ namespace IoTMcu
                 Name = "LCD1"
             });
             Logs.Log("Start Hardway");
-            new HC138();
-            new HC595();
-            HC138.SetEnable(false);
+            UartUtils = new();
             Logs.Log("Start Socket");
             SocketIoT = new();
             Logs.Log("Start Show");

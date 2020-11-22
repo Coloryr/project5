@@ -17,11 +17,13 @@ void TaskUart(void *data)
         int len = uart_read_bytes(UART_NUM_1, UARTRData, BUF_SIZE, 20 / portTICK_RATE_MS);
         if (len > 0)
         {
+            printf("收到数据\n");
             if (Check(UARTRData))
             {
                 printf("数据包错误\n");
                 continue;
             }
+            // printf("数据包类型%d\n", UARTRData[5]);
             switch (UARTRData[5])
             {
             case 0x01:

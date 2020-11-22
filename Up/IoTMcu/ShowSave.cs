@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Device.Gpio;
 using System.Drawing;
 using System.IO;
@@ -14,11 +15,11 @@ namespace IoTMcu
         public static Bitmap ShowImg;
 
         public readonly Dictionary<int, ShowObj> ShowList = new();
-        private readonly List<PinValue[]> ShowRedTemp = new();
-        private readonly List<PinValue[]> ShowBulTemp = new();
 
+        private BitArray RedBitData;
+        private BitArray BulBitData;
         private Thread UpdateThread;
-        private Thread ShowThread;
+        private byte[] ShowData;
 
         private Color Red;
         private Color Blue;
@@ -41,39 +42,46 @@ namespace IoTMcu
                 for (; ; )
                 {
                     IoTMcuMain.IsBoot.WaitOne();
-                    var show = IoTMcuMain.Show.ShowList[showindex];
-                    if (updata)
+                    if (ShowList.Count == 0)
                     {
-                        for (int i = 0; i < IoTMcuMain.Config.Height; i++)
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        var show = ShowList[showindex];
+                        if (updata)
                         {
-                            for (int j = 0; j < IoTMcuMain.Config.Width; j++)
+                            for (int i = 0; i < IoTMcuMain.Config.Height; i++)
                             {
-                                var temp = ShowImg.GetPixel(j, i);
-                                if (temp == Red)
+                                for (int j = 0; j < IoTMcuMain.Config.Width; j++)
                                 {
-                                    ShowRedTemp[i][j] = PinValue.Low;
-                                    ShowBulTemp[i][j] = PinValue.High;
-                                }
-                                else if (temp == Blue)
-                                {
-                                    ShowRedTemp[i][j] = PinValue.Low;
-                                    ShowBulTemp[i][j] = PinValue.High;
-                                }
-                                else if (temp == Mix)
-                                {
-                                    ShowRedTemp[i][j] = PinValue.Low;
-                                    ShowBulTemp[i][j] = PinValue.Low;
-                                }
-                                else
-                                {
-                                    ShowRedTemp[i][j] = PinValue.High;
-                                    ShowBulTemp[i][j] = PinValue.High;
+                                    var temp = ShowImg.GetPixel(j, i);
+                                    if (temp == Red)
+                                    {
+                                        RedBitData[i * j] = false;
+                                        BulBitData[i * j] = true;
+                                    }
+                                    else if (temp == Blue)
+                                    {
+                                        RedBitData[i * j] = true;
+                                        BulBitData[i * j] = false;
+                                    }
+                                    else if (temp == Mix)
+                                    {
+                                        RedBitData[i * j] = false;
+                                        BulBitData[i * j] = false;
+                                    }
+                                    else
+                                    {
+                                        RedBitData[i * j] = true;
+                                        BulBitData[i * j] = true;
+                                    }
                                 }
                             }
+                            updata = false;
                         }
-                        updata = false;
+                        Thread.Sleep(100);
                     }
-                    Thread.Sleep(100);
                 }
             });
             if (!Directory.Exists(Local))
@@ -90,8 +98,6 @@ namespace IoTMcu
                 }
             }
             Start();
-            ShowThread = new Thread(StartShow);
-            ShowThread.Start();
             UpdateThread.Start();
         }
         public void SetShow(string data)
@@ -116,74 +122,29 @@ namespace IoTMcu
             {
                 ShowImg.Dispose();
             }
-            ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
             Bank = IoTMcuMain.Config.Height / 16;
-            ShowRedTemp.Clear();
-            ShowBulTemp.Clear();
-            for (int i = 0; i < IoTMcuMain.Config.Height; i++)
-            {
-                ShowRedTemp.Add(new PinValue[IoTMcuMain.Config.Width]);
-                ShowBulTemp.Add(new PinValue[IoTMcuMain.Config.Width]);
-            }
-            for (int i = 0; i < IoTMcuMain.Config.Height; i++)
-            {
-                for (int j = 0; j < IoTMcuMain.Config.Width; j++)
-                {
-                    ShowRedTemp[i][j] = PinValue.Low;
-                    ShowBulTemp[i][j] = PinValue.Low;
-                }
-            }
             if (Bank != 1 && Bank != 2)
             {
                 Logs.Log($"显示高度错误{Bank}");
+                return;
             }
-        }
-
-        public void StartShow()
-        {
-            Logs.Log("显示开启");
-            HC138.SetEnable(true);
-            int line = 0;
-            if (Bank == 1)
+            Bank = IoTMcuMain.Config.Width % 8;
+            if (Bank != 0)
             {
-                for (; ; )
-                {
-                    IoTMcuMain.IsBoot.WaitOne();
-                    //Thread.Sleep(10);
-                    HC595.SetDate(ShowRedTemp[line], null,
-                        ShowBulTemp[line], null, IoTMcuMain.Config.Width, false);
-                    //HC595.SetOut(false);
-                    HC138.AddPos();
-                    HC595.Unlock();
-                    //HC595.SetOut(true);
-                    line++;
-                    if (IoTMcuMain.Config.Width >= line)
-                    {
-                        line = 0;
-                        HC138.Reset();
-                    }
-                }
+                Logs.Log($"显示宽度错误{Bank}");
+                return;
             }
-            else if (Bank == 2)
-            {
-                for (; ; )
-                {
-                    IoTMcuMain.IsBoot.WaitOne();
-                    //Thread.Sleep(10);
-                    HC595.SetDate(ShowRedTemp[line], ShowRedTemp[line + 16],
-                        ShowBulTemp[line], ShowBulTemp[line + 16], IoTMcuMain.Config.Width);
-                    //HC595.SetOut(false);
-                    HC138.AddPos();
-                    HC595.Unlock();
-                    //HC595.SetOut(true);
-                    line++;
-                    if (IoTMcuMain.Config.Width >= line)
-                    {
-                        line = 0;
-                        HC138.Reset();
-                    }
-                }
-            }
+            ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
+            RedBitData = new BitArray(IoTMcuMain.Config.Height * IoTMcuMain.Config.Width);
+            BulBitData = new BitArray(IoTMcuMain.Config.Height * IoTMcuMain.Config.Width);
+            ShowData = new byte[IoTMcuMain.Config.Height * IoTMcuMain.Config.Width / 8 * 2];
+            var data = new byte[8];
+            UartUtils.BuildPack(data);
+            data[5] = 0x01;
+            data[6] = (byte)IoTMcuMain.Config.Height;
+            data[7] = (byte)IoTMcuMain.Config.Width;
+            IoTMcuMain.UartUtils.Write(data);
+            updata = true;
         }
     }
 }

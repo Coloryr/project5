@@ -17,6 +17,6 @@ void app_main()
     HC595Init();
     UartInit();
     DataInit();
-    xTaskCreate(TaskShow, "TaskShow", 2048, NULL, configMAX_PRIORITIES, NULL);
-    xTaskCreate(TaskUart, "TaskUart", 2048, NULL, configMAX_PRIORITIES, NULL);
+    // xTaskCreate(TaskShow, "TaskShow", 2048, NULL, configMAX_PRIORITIES, NULL);
+    xTaskCreate(TaskUart, "TaskUart", 2048, NULL, 2, NULL);
 }

@@ -53,6 +53,7 @@ void InitShow()
 
 void SetRun(uint8_t *data, uint8_t start)
 {
+    printf("正在设置屏幕\n");
     CanRun = 0;
     vTaskDelay(50 / portTICK_PERIOD_MS);
 
@@ -62,6 +63,8 @@ void SetRun(uint8_t *data, uint8_t start)
     Width = data[start + 1] / 8;
 
     InitShow();
+
+    printf("设置屏幕参数%d,%d\n", Height, Width);
 
     CanRun = 1;
 }
