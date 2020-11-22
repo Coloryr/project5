@@ -14,36 +14,34 @@ uint8_t **BULData;
 
 void DataInit()
 {
-    Height = 0;
-    Width = 0;
+    Height = 16;
+    Width = 4;
     CanRun = 1;
 
     REDData = NULL;
     BULData = NULL;
+
+    InitShow();
 }
 
-void SetRun(uint8_t *data, uint8_t start)
+void FreeShow()
 {
-    uint16_t i;
-    CanRun = 0;
-    vTaskDelay(50 / portTICK_PERIOD_MS);
-
     if (REDData != NULL)
     {
-        for (int i = 0; i < Width; i++)
+        for (uint8_t i = 0; i < Width; i++)
             free(REDData[i]);
         free(REDData);
     }
     if (BULData != NULL)
     {
-        for (int i = 0; i < Width; i++)
+        for (uint8_t i = 0; i < Width; i++)
             free(BULData[i]);
         free(BULData);
     }
+}
 
-    Height = data[start];
-    Width = data[start + 1] / 8;
-
+void InitShow()
+{
     REDData = (uint8_t **)malloc(Height * sizeof(int *));
     BULData = (uint8_t **)malloc(Height * sizeof(int *));
     for (uint8_t i = 0; i < Height; i++)
@@ -51,6 +49,19 @@ void SetRun(uint8_t *data, uint8_t start)
         REDData[i] = (uint8_t *)malloc(Width * sizeof(int));
         BULData[i] = (uint8_t *)malloc(Width * sizeof(int));
     }
+}
+
+void SetRun(uint8_t *data, uint8_t start)
+{
+    CanRun = 0;
+    vTaskDelay(50 / portTICK_PERIOD_MS);
+
+    FreeShow();
+
+    Height = data[start];
+    Width = data[start + 1] / 8;
+
+    InitShow();
 
     CanRun = 1;
 }

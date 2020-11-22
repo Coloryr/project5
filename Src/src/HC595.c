@@ -48,10 +48,10 @@ void UnLock()
     gpio_set_level(MLOCK, 0);
 }
 
-void SetDataA(uint8_t *data1, uint8_t *data2, uint16_t size)
+void SetDataA(uint8_t *data1, uint8_t *data2, uint8_t size)
 {
     uint8_t i;
-    uint16_t local;
+    uint8_t local;
     uint8_t data_1;
     uint8_t data_2;
 
@@ -72,10 +72,10 @@ void SetDataA(uint8_t *data1, uint8_t *data2, uint16_t size)
     }
 }
 
-void SetDataB(uint8_t *data1, uint8_t *data2,uint8_t *data3, uint8_t *data4, uint16_t size)
+void SetDataB(uint8_t *data1, uint8_t *data2,uint8_t *data3, uint8_t *data4, uint8_t size)
 {
     uint8_t i;
-    uint16_t local;
+    uint8_t local;
     uint8_t data_1;
     uint8_t data_2;
     uint8_t data_3;

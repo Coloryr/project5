@@ -9,7 +9,6 @@
 
 void TaskShow(void *data)
 {
-    uint8_t x;
     uint8_t y;
     printf("开始显示\n");
     for (;;)
@@ -33,12 +32,13 @@ void TaskShow(void *data)
                 AddPos();
                 UnLock();
                 SetEnable(0);
-                vTaskDelay(10 / portTICK_PERIOD_MS);
+                vTaskDelay(5 / portTICK_PERIOD_MS);
             }
         }
         else
         {
             vTaskDelay(20 / portTICK_PERIOD_MS);
         }
+        
     }
 }

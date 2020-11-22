@@ -11,6 +11,8 @@ extern uint8_t **REDData;
 extern uint8_t **BULData;
 
 void DataInit();
+void FreeShow();
+void InitShow();
 void SetRun(uint8_t *data, uint8_t start);
 void SetShow(uint8_t *data, uint8_t start);
 

@@ -15,7 +15,7 @@
 void HC595Init();
 void Reset();
 void UnLock();
-void SetDataA(uint8_t *data1, uint8_t *data2, uint16_t size);
-void SetDataB(uint8_t *data1, uint8_t *data2,uint8_t *data3, uint8_t *data4, uint16_t size);
+void SetDataA(uint8_t *data1, uint8_t *data2, uint8_t size);
+void SetDataB(uint8_t *data1, uint8_t *data2,uint8_t *data3, uint8_t *data4, uint8_t size);
 
 #endif

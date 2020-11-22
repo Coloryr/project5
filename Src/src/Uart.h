@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-#define TXD1 34
-#define RXD1 35
+#define TXD1 32
+#define RXD1 33
 #define BUF_SIZE 1024
 
 extern uint8_t *UARTRData;
