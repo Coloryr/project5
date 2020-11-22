@@ -97,9 +97,12 @@ namespace IoTMcuEdit
             switch (obj.Type)
             {
                 case PackType.Info:
-                    LcdObj.Name = obj.Data;
-                    LcdObj.X = obj.Data3;
-                    LcdObj.Y = obj.Data4;
+                    Dispatcher.Invoke(() =>
+                    {
+                        LcdObj.Name = obj.Data;
+                        LcdObj.X = obj.Data3;
+                        LcdObj.Y = obj.Data4;
+                    });
 
                     var list = JsonConvert.DeserializeObject<List<string>>(obj.Data1);
                     Dispatcher.Invoke(() =>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Device.Gpio;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace IoTMcu
 {
@@ -45,7 +46,6 @@ namespace IoTMcu
             PinValue[] data3, PinValue[] data4, int size, bool both = true)
         {
             int local;
-
             for (local = 0; local < size; local++)
             {
                 IoTMcuMain.GpioController.Write(M1BLU, data1[local]);
@@ -57,14 +57,14 @@ namespace IoTMcu
                 }
 
                 IoTMcuMain.GpioController.Write(MCLK, PinValue.Low);
-                Thread.Sleep(TimeSpan.FromMilliseconds(10));
+                Thread.Sleep(TimeSpan.FromMilliseconds(1));
                 IoTMcuMain.GpioController.Write(MCLK, PinValue.High);
             }
         }
         public static void Unlock()
         {
             IoTMcuMain.GpioController.Write(MLOCK, PinValue.High);
-            Thread.Sleep(TimeSpan.FromMilliseconds(10));
+            Thread.Sleep(TimeSpan.FromMilliseconds(1));
             IoTMcuMain.GpioController.Write(MLOCK, PinValue.Low);
         }
     }

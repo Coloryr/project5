@@ -150,10 +150,13 @@ namespace IoTMcu
                                 SendNext(pack, ThisSocket);
                                 break;
                             case PackType.SetInfo:
+                                IoTMcuMain.IsBoot.Reset();
                                 IoTMcuMain.Config.Name = obj.Data;
                                 IoTMcuMain.Config.Width = obj.Data3;
                                 IoTMcuMain.Config.Height = obj.Data4;
                                 ConfigRead.Write(IoTMcuMain.Config, IoTMcuMain.ConfigName);
+                                IoTMcuMain.Show.Start();
+                                IoTMcuMain.IsBoot.Set();
                                 break;
                             case PackType.ListFont:
                                 pack.Type = PackType.ListFont;

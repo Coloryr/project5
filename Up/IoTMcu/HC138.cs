@@ -1,16 +1,20 @@
-﻿using System.Device.Gpio;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Device.Gpio;
 
 namespace IoTMcu
 {
     public class HC138
     {
-        private const int A0 = 15;
+        private const int A0 = 14;
         private const int A1 = 16;
-        private const int A2 = 14;
+        private const int A2 = 15;
         private const int A3 = 3;
         private const int AEN = 0;
 
-        private static int Local;
+        private static byte Local;
+
+        private static List<PinValue[]> PinValues = new();
 
         public HC138()
         {
@@ -25,13 +29,29 @@ namespace IoTMcu
             IoTMcuMain.GpioController.Write(A2, PinValue.High);
             IoTMcuMain.GpioController.Write(A3, PinValue.High);
             IoTMcuMain.GpioController.Write(AEN, PinValue.High);
+
+            PinValues.Add(new PinValue[4] { PinValue.Low, PinValue.Low, PinValue.Low, PinValue.Low });
+            PinValues.Add(new PinValue[4] { PinValue.Low, PinValue.Low, PinValue.High, PinValue.Low });
+            PinValues.Add(new PinValue[4] { PinValue.Low, PinValue.Low, PinValue.High, PinValue.High });
+            PinValues.Add(new PinValue[4] { PinValue.Low, PinValue.High, PinValue.Low, PinValue.Low });
+            PinValues.Add(new PinValue[4] { PinValue.Low, PinValue.High, PinValue.Low, PinValue.High });
+            PinValues.Add(new PinValue[4] { PinValue.Low, PinValue.High, PinValue.High, PinValue.Low });
+            PinValues.Add(new PinValue[4] { PinValue.Low, PinValue.High, PinValue.High, PinValue.High });
+            PinValues.Add(new PinValue[4] { PinValue.High, PinValue.Low, PinValue.Low, PinValue.Low });
+            PinValues.Add(new PinValue[4] { PinValue.High, PinValue.Low, PinValue.Low, PinValue.High });
+            PinValues.Add(new PinValue[4] { PinValue.High, PinValue.Low, PinValue.High, PinValue.Low });
+            PinValues.Add(new PinValue[4] { PinValue.High, PinValue.Low, PinValue.High, PinValue.High });
+            PinValues.Add(new PinValue[4] { PinValue.High, PinValue.High, PinValue.Low, PinValue.Low });
+            PinValues.Add(new PinValue[4] { PinValue.High, PinValue.High, PinValue.Low, PinValue.High });
+            PinValues.Add(new PinValue[4] { PinValue.High, PinValue.High, PinValue.High, PinValue.Low });
+            PinValues.Add(new PinValue[4] { PinValue.High, PinValue.High, PinValue.High, PinValue.High });
         }
         public static void SetPin()
         {
-            IoTMcuMain.GpioController.Write(A0, (Local & 0x01) == 0x01 ? PinValue.High : PinValue.Low);
-            IoTMcuMain.GpioController.Write(A1, (Local & 0x02) == 0x01 ? PinValue.High : PinValue.Low);
-            IoTMcuMain.GpioController.Write(A2, (Local & 0x04) == 0x01 ? PinValue.High : PinValue.Low);
-            IoTMcuMain.GpioController.Write(A3, (Local & 0x08) == 0x01 ? PinValue.High : PinValue.Low);
+            IoTMcuMain.GpioController.Write(A0, PinValues[Local][0]);
+            IoTMcuMain.GpioController.Write(A1, PinValues[Local][1]);
+            IoTMcuMain.GpioController.Write(A2, PinValues[Local][2]);
+            IoTMcuMain.GpioController.Write(A3, PinValues[Local][3]);
         }
         public static void SetEnable(bool enable)
         {
@@ -46,7 +66,7 @@ namespace IoTMcu
         {
             if (pos > 15)
                 return;
-            Local = pos;
+            Local = (byte)pos;
             SetPin();
         }
 

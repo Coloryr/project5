@@ -41,13 +41,14 @@ namespace IoTMcu
                     Port = 25555
                 },
                 NeedServer = false,
-                Height = 32,
-                Width = 16,
+                Height = 16,
+                Width = 32,
                 Name = "LCD1"
             });
             Logs.Log("Start Hardway");
             new HC138();
             new HC595();
+            HC138.SetEnable(false);
             Logs.Log("Start Socket");
             SocketIoT = new();
             Logs.Log("Start Show");

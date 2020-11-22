@@ -118,6 +118,8 @@ namespace IoTMcu
             }
             ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
             Bank = IoTMcuMain.Config.Height / 16;
+            ShowRedTemp.Clear();
+            ShowBulTemp.Clear();
             for (int i = 0; i < IoTMcuMain.Config.Height; i++)
             {
                 ShowRedTemp.Add(new PinValue[IoTMcuMain.Config.Width]);
@@ -127,29 +129,33 @@ namespace IoTMcu
             {
                 for (int j = 0; j < IoTMcuMain.Config.Width; j++)
                 {
-                    ShowRedTemp[i][j] = PinValue.High;
-                    ShowBulTemp[i][j] = PinValue.High;
+                    ShowRedTemp[i][j] = PinValue.Low;
+                    ShowBulTemp[i][j] = PinValue.Low;
                 }
+            }
+            if (Bank != 1 && Bank != 2)
+            {
+                Logs.Log($"显示高度错误{Bank}");
             }
         }
 
         public void StartShow()
         {
+            Logs.Log("显示开启");
             HC138.SetEnable(true);
-            HC595.SetOut(true);
             int line = 0;
-            if (Bank == 0)
+            if (Bank == 1)
             {
                 for (; ; )
                 {
                     IoTMcuMain.IsBoot.WaitOne();
-                    Thread.Sleep(10);
+                    //Thread.Sleep(10);
                     HC595.SetDate(ShowRedTemp[line], null,
                         ShowBulTemp[line], null, IoTMcuMain.Config.Width, false);
-                    HC595.SetOut(false);
+                    //HC595.SetOut(false);
                     HC138.AddPos();
                     HC595.Unlock();
-                    HC595.SetOut(true);
+                    //HC595.SetOut(true);
                     line++;
                     if (IoTMcuMain.Config.Width >= line)
                     {
@@ -158,18 +164,18 @@ namespace IoTMcu
                     }
                 }
             }
-            else if (Bank == 1)
+            else if (Bank == 2)
             {
                 for (; ; )
                 {
                     IoTMcuMain.IsBoot.WaitOne();
-                    Thread.Sleep(10);
+                    //Thread.Sleep(10);
                     HC595.SetDate(ShowRedTemp[line], ShowRedTemp[line + 16],
                         ShowBulTemp[line], ShowBulTemp[line + 16], IoTMcuMain.Config.Width);
-                    HC595.SetOut(false);
+                    //HC595.SetOut(false);
                     HC138.AddPos();
                     HC595.Unlock();
-                    HC595.SetOut(true);
+                    //HC595.SetOut(true);
                     line++;
                     if (IoTMcuMain.Config.Width >= line)
                     {
