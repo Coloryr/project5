@@ -12,8 +12,11 @@ void test()
 {
     for (uint8_t i = 0; i < Height; i++)
     {
-        REDData[i] = 0x00;
-        BULData[i] = 0xff;
+        for (uint8_t j = 0; j < Width; j++)
+        {
+            REDData[i][j] = 0x00;
+            BULData[i][j] = 0xff;
+        }
     }
 }
 
