@@ -9,24 +9,11 @@ namespace IoTMcu
 {
     public class FontData
     {
-        public enum FontSize
+        public static readonly Dictionary<FontSelfColor, Brush> BrushesSave = new()
         {
-            px12 = 12,
-            px16 = 16,
-            px24 = 24,
-            px32 = 32
-        }
-        public enum SelfColor
-        {
-            RED,
-            BULE,
-            MIX
-        }
-        public static readonly Dictionary<SelfColor, Brush> BrushesSave = new()
-        {
-            { SelfColor.RED, Brushes.Red },
-            { SelfColor.BULE, Brushes.Blue },
-            { SelfColor.MIX, Brushes.Orange }
+            { FontSelfColor.RED, Brushes.Red },
+            { FontSelfColor.BULE, Brushes.Blue },
+            { FontSelfColor.MIX, Brushes.Lime }
         };
     }
     public class FontSave
@@ -34,8 +21,6 @@ namespace IoTMcu
         public static readonly string Local = IoTMcuMain.Local + "Font/";
 
         public readonly Dictionary<string, Font> FontList = new();
-
-        private Graphics Graphics;
         public FontSave()
         {
             Start();
@@ -43,9 +28,6 @@ namespace IoTMcu
         public void Start()
         {
             PrivateFontCollection pfc = new();
-            Graphics = Graphics.FromImage(ShowSave.ShowImg);
-            Graphics.FillRectangle(Brushes.Black,
-                new Rectangle(0, 0, IoTMcuMain.Config.Width, IoTMcuMain.Config.Height));
             if (!Directory.Exists(Local))
             {
                 Directory.CreateDirectory(Local);
@@ -77,7 +59,8 @@ namespace IoTMcu
             }
             pfc.Dispose();
         }
-        public void GenShow(string data, string FontName, int x, int y, FontData.FontSize size, FontData.SelfColor color)
+
+        public void GenShow(Graphics Graphics, string data, string FontName, int x, int y, FontSelfSize size, FontSelfColor color)
         {
             if (FontList.ContainsKey(FontName + size))
             {

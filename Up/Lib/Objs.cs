@@ -1,18 +1,18 @@
 ﻿namespace Lib
 {
-    public class Objs
+    public enum FontSelfSize
     {
-        public enum FontSelfSize
-        {
-            px12, px16, px24, px32
-        }
-        public enum FontSelfColor
-        {
-            A, B, C
-        }
-        public enum ShowType
-        {
-            Normal,
-        }
+        px12 = 12,
+        px16 = 16,
+        px24 = 24,
+        px32 = 32
+    }
+    public enum FontSelfColor
+    {
+        RED, BULE, MIX
+    }
+    public enum ShowType
+    {
+        Normal,
     }
 }

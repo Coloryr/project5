@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Lib;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static Lib.Objs;
 
 namespace IoTMcuEdit
 {
@@ -11,7 +11,7 @@ namespace IoTMcuEdit
         private int _Y = 0;
         private int _Time = 1000;
         private FontSelfSize _Size = FontSelfSize.px12;
-        private FontSelfColor _Color = FontSelfColor.A;
+        private FontSelfColor _Color = FontSelfColor.RED;
         private string _FontType;
         private string _Text = "测试";
         private int _Index = 0;

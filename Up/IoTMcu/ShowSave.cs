@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Device.Gpio;
 using System.Drawing;
@@ -13,13 +14,13 @@ namespace IoTMcu
         public static readonly string Local = IoTMcuMain.Local + "ShowList/";
 
         public static Bitmap ShowImg;
+        public static Graphics Graphics;
 
         public readonly Dictionary<int, ShowObj> ShowList = new();
 
-        private BitArray RedBitData;
-        private BitArray BulBitData;
         private Thread UpdateThread;
         private byte[] ShowData;
+        private int BULLocal;
 
         private Color Red;
         private Color Blue;
@@ -30,55 +31,73 @@ namespace IoTMcu
         private int Bank = 0;
         private int showindex = 0;
         private int showdelay = 0;
+        private int XCount;
+        private int YCount;
 
         public ShowSave()
         {
-            Red = Color.Red;
-            Blue = Color.Blue;
-            Mix = Color.Orange;
+            Red = Color.FromArgb(255, 0, 0);
+            Blue = Color.FromArgb(0, 0, 255);
+            Mix = Color.FromArgb(0, 255, 0);
 
             UpdateThread = new Thread(() =>
             {
                 for (; ; )
                 {
                     IoTMcuMain.IsBoot.WaitOne();
-                    if (ShowList.Count == 0)
+                    //if (ShowList.Count == 0)
+                    //{
+                    //    Thread.Sleep(1000);
+                    //}
+                    //else
                     {
-                        Thread.Sleep(1000);
-                    }
-                    else
-                    {
-                        var show = ShowList[showindex];
+                        //var show = ShowList[showindex];
                         if (updata)
                         {
+                            Logs.Log("更新显示");
                             for (int i = 0; i < IoTMcuMain.Config.Height; i++)
                             {
                                 for (int j = 0; j < IoTMcuMain.Config.Width; j++)
                                 {
                                     var temp = ShowImg.GetPixel(j, i);
+                                    int bit = j / 8;
+                                    int bit_ = j % 8;
                                     if (temp == Red)
                                     {
-                                        RedBitData[i * j] = false;
-                                        BulBitData[i * j] = true;
+                                        ShowData[bit + i * XCount] &= (byte)~(1 << bit_);
+                                        ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
                                     }
                                     else if (temp == Blue)
                                     {
-                                        RedBitData[i * j] = true;
-                                        BulBitData[i * j] = false;
+                                        ShowData[bit + i * XCount] |= (byte)(1 << bit_);
+                                        ShowData[bit + BULLocal + i * XCount] &= (byte)~(1 << bit_);
                                     }
                                     else if (temp == Mix)
                                     {
-                                        RedBitData[i * j] = false;
-                                        BulBitData[i * j] = false;
+                                        ShowData[bit + i * XCount] &= (byte)~(1 << bit_);
+                                        ShowData[bit + BULLocal + i * XCount] &= (byte)~(1 << bit_);
                                     }
                                     else
                                     {
-                                        RedBitData[i * j] = true;
-                                        BulBitData[i * j] = true;
+                                        ShowData[bit + i * XCount] |= (byte)(1 << bit_);
+                                        ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
                                     }
                                 }
                             }
                             updata = false;
+                            string valueString = "";
+                            int a = 0;
+                            foreach (var item in ShowData)
+                            {
+                                a++;
+                                valueString += Convert.ToString(item, 2).PadLeft(8, '0');
+                                if (a == XCount)
+                                {
+                                    a = 0;
+                                    Console.WriteLine(valueString);
+                                    valueString = "";
+                                }
+                            }
                         }
                         Thread.Sleep(100);
                     }
@@ -118,6 +137,10 @@ namespace IoTMcu
         }
         public void Start()
         {
+            if (Graphics != null)
+            {
+                Graphics.Dispose();
+            }
             if (ShowImg != null)
             {
                 ShowImg.Dispose();
@@ -135,9 +158,23 @@ namespace IoTMcu
                 return;
             }
             ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
-            RedBitData = new BitArray(IoTMcuMain.Config.Height * IoTMcuMain.Config.Width);
-            BulBitData = new BitArray(IoTMcuMain.Config.Height * IoTMcuMain.Config.Width);
-            ShowData = new byte[IoTMcuMain.Config.Height * IoTMcuMain.Config.Width / 8 * 2];
+            Graphics = Graphics.FromImage(ShowImg);
+            Graphics.FillRectangle(Brushes.White,
+                new Rectangle(0, 0, IoTMcuMain.Config.Width, IoTMcuMain.Config.Height));
+            Graphics.FillRectangle(Brushes.Red,
+                new Rectangle(0, 0, 8, 8));
+            Graphics.FillRectangle(Brushes.Blue,
+                new Rectangle(8, 8, 8, 8));
+            Graphics.FillRectangle(Brushes.Lime,
+                new Rectangle(24, 0, 8, 8));
+
+            XCount = IoTMcuMain.Config.Width / 8;
+            YCount = IoTMcuMain.Config.Height / 8;
+
+            ShowData = new byte[IoTMcuMain.Config.Height * XCount * 2];
+
+            BULLocal = IoTMcuMain.Config.Height * XCount;
+
             var data = new byte[8];
             UartUtils.BuildPack(data);
             data[5] = 0x01;

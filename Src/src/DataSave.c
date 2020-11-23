@@ -29,18 +29,12 @@ void FreeShow()
     printf("释放完毕\n");
     if (REDData != NULL)
     {
-        for (uint8_t i = 0; i < Height; ++i)
-        {
-            free(REDData[i]);
-        }
+        free(REDData[0]);
         free(REDData);
     }
     if (BULData != NULL)
     {
-        for (uint8_t i = 0; i < Height; ++i)
-        {
-            free(BULData[i]);
-        }
+        free(BULData[0]);
         free(BULData);
     }
 }
@@ -50,12 +44,14 @@ void InitShow()
     printf("设置屏幕参数%d,%d\n", Height, Width);
 
     REDData = (uint8_t **)malloc(Height * sizeof(uint8_t *));
+    REDData[0] = (uint8_t *)malloc(Height * Width * sizeof(uint8_t));
     BULData = (uint8_t **)malloc(Height * sizeof(uint8_t *));
+    BULData[0] = (uint8_t *)malloc(Height * Width * sizeof(uint8_t));
 
-    for (uint8_t i = 0; i < Height; ++i)
+    for (uint8_t i = 1; i < Height; ++i)
     {
-        REDData[i] = (uint8_t *)malloc(Width * sizeof(uint8_t));
-        BULData[i] = (uint8_t *)malloc(Width * sizeof(uint8_t));
+        REDData[i] = REDData[i - 1] + Width;
+        BULData[i] = BULData[i - 1] + Width;
     }
 }
 

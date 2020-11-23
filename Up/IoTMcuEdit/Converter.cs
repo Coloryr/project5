@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Lib;
+using System;
 using System.Windows.Data;
-using static Lib.Objs;
 
 namespace IoTMcuEdit
 {

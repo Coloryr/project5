@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using static Lib.Objs;
+﻿using Lib;
+using System.Collections.Generic;
 
 namespace IoTMcu
 {
