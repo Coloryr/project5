@@ -40,69 +40,7 @@ namespace IoTMcu
             Blue = Color.FromArgb(0, 0, 255);
             Mix = Color.FromArgb(0, 255, 0);
 
-            UpdateThread = new Thread(() =>
-            {
-                for (; ; )
-                {
-                    IoTMcuMain.IsBoot.WaitOne();
-                    //if (ShowList.Count == 0)
-                    //{
-                    //    Thread.Sleep(1000);
-                    //}
-                    //else
-                    {
-                        //var show = ShowList[showindex];
-                        if (updata)
-                        {
-                            Logs.Log("更新显示");
-                            for (int i = 0; i < IoTMcuMain.Config.Height; i++)
-                            {
-                                for (int j = 0; j < IoTMcuMain.Config.Width; j++)
-                                {
-                                    var temp = ShowImg.GetPixel(j, i);
-                                    int bit = j / 8;
-                                    int bit_ = j % 8;
-                                    if (temp == Red)
-                                    {
-                                        ShowData[bit + i * XCount] &= (byte)~(1 << bit_);
-                                        ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
-                                    }
-                                    else if (temp == Blue)
-                                    {
-                                        ShowData[bit + i * XCount] |= (byte)(1 << bit_);
-                                        ShowData[bit + BULLocal + i * XCount] &= (byte)~(1 << bit_);
-                                    }
-                                    else if (temp == Mix)
-                                    {
-                                        ShowData[bit + i * XCount] &= (byte)~(1 << bit_);
-                                        ShowData[bit + BULLocal + i * XCount] &= (byte)~(1 << bit_);
-                                    }
-                                    else
-                                    {
-                                        ShowData[bit + i * XCount] |= (byte)(1 << bit_);
-                                        ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
-                                    }
-                                }
-                            }
-                            updata = false;
-                            string valueString = "";
-                            int a = 0;
-                            foreach (var item in ShowData)
-                            {
-                                a++;
-                                valueString += Convert.ToString(item, 2).PadLeft(8, '0');
-                                if (a == XCount)
-                                {
-                                    a = 0;
-                                    Console.WriteLine(valueString);
-                                    valueString = "";
-                                }
-                            }
-                        }
-                        Thread.Sleep(100);
-                    }
-                }
-            });
+            UpdateThread = new Thread(Update);
             if (!Directory.Exists(Local))
             {
                 Directory.CreateDirectory(Local);
@@ -118,6 +56,85 @@ namespace IoTMcu
             }
             Start();
             UpdateThread.Start();
+        }
+
+        private void Update()
+        {
+            for (; ; )
+            {
+                IoTMcuMain.IsBoot.WaitOne();
+                if (ShowList.Count == 0)
+                {
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    var show = ShowList[showindex];
+                    if (updata)
+                    {
+                        ClearShow();
+
+                        //画汉字
+
+                        UpdateShow();
+                        updata = false;
+                    }
+                    Thread.Sleep(100);
+                }
+            }
+        }
+
+        private void ClearShow()
+        {
+            Graphics.FillRectangle(Brushes.White,
+               new Rectangle(0, 0, IoTMcuMain.Config.Width, IoTMcuMain.Config.Height));
+        }
+
+        private void UpdateShow()
+        {
+            Logs.Log("更新显示");
+            for (int i = 0; i < IoTMcuMain.Config.Height; i++)
+            {
+                for (int j = 0; j < IoTMcuMain.Config.Width; j++)
+                {
+                    var temp = ShowImg.GetPixel(j, i);
+                    int bit = j / 8;
+                    int bit_ = j % 8;
+                    if (temp == Red)
+                    {
+                        ShowData[bit + i * XCount] &= (byte)~(1 << bit_);
+                        ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
+                    }
+                    else if (temp == Blue)
+                    {
+                        ShowData[bit + i * XCount] |= (byte)(1 << bit_);
+                        ShowData[bit + BULLocal + i * XCount] &= (byte)~(1 << bit_);
+                    }
+                    else if (temp == Mix)
+                    {
+                        ShowData[bit + i * XCount] &= (byte)~(1 << bit_);
+                        ShowData[bit + BULLocal + i * XCount] &= (byte)~(1 << bit_);
+                    }
+                    else
+                    {
+                        ShowData[bit + i * XCount] |= (byte)(1 << bit_);
+                        ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
+                    }
+                }
+            }
+            string valueString = "";
+            int a = 0;
+            foreach (var item in ShowData)
+            {
+                a++;
+                valueString += Convert.ToString(item, 2).PadLeft(8, '0');
+                if (a == XCount)
+                {
+                    a = 0;
+                    Console.WriteLine(valueString);
+                    valueString = "";
+                }
+            }
         }
         public void SetShow(string data)
         {
@@ -159,8 +176,9 @@ namespace IoTMcu
             }
             ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
             Graphics = Graphics.FromImage(ShowImg);
-            Graphics.FillRectangle(Brushes.White,
-                new Rectangle(0, 0, IoTMcuMain.Config.Width, IoTMcuMain.Config.Height));
+
+            ClearShow();
+
             Graphics.FillRectangle(Brushes.Red,
                 new Rectangle(0, 0, 8, 8));
             Graphics.FillRectangle(Brushes.Blue,

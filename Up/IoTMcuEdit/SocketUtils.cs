@@ -10,12 +10,6 @@ namespace IoTMcuEdit
 {
     class SocketUtils
     {
-        class StateObject
-        {
-            public Socket workSocket = null;
-            public const int BufferSize = 8196;
-            public byte[] buffer = new byte[BufferSize];
-        }
         public bool IsConnect { get; private set; }
         private Socket socket = new(SocketType.Stream, ProtocolType.Tcp);
         private delegate void CallEvent(bool state);
@@ -58,13 +52,13 @@ namespace IoTMcuEdit
         {
             try
             {
-                StateObject state = (StateObject)ar.AsyncState;
+                SocketObject state = (SocketObject)ar.AsyncState;
                 Socket ThisSocket = state.workSocket;
-                var pack = new StateObject
+                var pack = new SocketObject
                 {
                     workSocket = ThisSocket
                 };
-                ThisSocket.BeginReceive(pack.buffer, 0, StateObject.BufferSize, 0,
+                ThisSocket.BeginReceive(pack.buffer, 0, SocketObject.BufferSize, 0,
                     new AsyncCallback(ReceiveCallBack), pack);
                 int bytesRead = ThisSocket.EndReceive(ar);
                 if (bytesRead > 0)
@@ -96,11 +90,11 @@ namespace IoTMcuEdit
                     if(socket == null)
                         socket = new(SocketType.Stream, ProtocolType.Tcp);
                     socket.Connect(ip, port);
-                    var LastPackObj = new StateObject
+                    var LastPackObj = new SocketObject
                     {
                         workSocket = socket
                     };
-                    socket.BeginReceive(LastPackObj.buffer, 0, StateObject.BufferSize,
+                    socket.BeginReceive(LastPackObj.buffer, 0, SocketObject.BufferSize,
                     SocketFlags.None, new AsyncCallback(ReceiveCallBack), LastPackObj);
                     IsConnect = true;
                     ConnectCall.Invoke(IsConnect);

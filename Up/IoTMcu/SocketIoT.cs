@@ -9,12 +9,6 @@ using System.Threading;
 
 namespace IoTMcu
 {
-    class StateObject
-    {
-        public Socket workSocket = null;
-        public const int BufferSize = 8196;
-        public byte[] buffer = new byte[BufferSize];
-    }
     class SocketIoT
     {
         private Socket NextSocket;
@@ -67,9 +61,9 @@ namespace IoTMcu
 
         private void LastReceiveCallBack(IAsyncResult ar)
         {
-            StateObject state = (StateObject)ar.AsyncState;
+            SocketObject state = (SocketObject)ar.AsyncState;
             Socket ThisSocket = state.workSocket;
-            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(LastReceiveCallBack), state);
+            ThisSocket.BeginReceive(state.buffer, 0, SocketObject.BufferSize, 0, new AsyncCallback(LastReceiveCallBack), state);
             int bytesRead = ThisSocket.EndReceive(ar);
             if (bytesRead > 0)
             {
@@ -84,13 +78,13 @@ namespace IoTMcu
         {
             try
             {
-                StateObject state = (StateObject)ar.AsyncState;
+                SocketObject state = (SocketObject)ar.AsyncState;
                 Socket ThisSocket = state.workSocket;
-                var nextpack = new StateObject
+                var nextpack = new SocketObject
                 {
                     workSocket = ThisSocket
                 };
-                ThisSocket.BeginReceive(nextpack.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(NextReceiveCallBack), nextpack);
+                ThisSocket.BeginReceive(nextpack.buffer, 0, SocketObject.BufferSize, 0, new AsyncCallback(NextReceiveCallBack), nextpack);
                 int bytesRead = ThisSocket.EndReceive(ar);
                 if (bytesRead > 0)
                 {
@@ -186,9 +180,9 @@ namespace IoTMcu
         }
         private void ServerReceiveCallBack(IAsyncResult ar)
         {
-            StateObject state = (StateObject)ar.AsyncState;
+            SocketObject state = (SocketObject)ar.AsyncState;
             Socket ThisSocket = state.workSocket;
-            ThisSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ServerReceiveCallBack), state);
+            ThisSocket.BeginReceive(state.buffer, 0, SocketObject.BufferSize, 0, new AsyncCallback(ServerReceiveCallBack), state);
             int bytesRead = ThisSocket.EndReceive(ar);
             if (bytesRead > 0)
             {
@@ -207,11 +201,11 @@ namespace IoTMcu
                 //IPEndPoint localEndPoint = new IPEndPoint(ipAddress, IoTMcuMain.Config.LastSocket.Port);
                 LastSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 LastSocket.Connect(IoTMcuMain.Config.LastSocket.IP, IoTMcuMain.Config.LastSocket.Port);
-                var LastPackObj = new StateObject
+                var LastPackObj = new SocketObject
                 {
                     workSocket = LastSocket
                 };
-                LastSocket.BeginReceive(LastPackObj.buffer, 0, StateObject.BufferSize,
+                LastSocket.BeginReceive(LastPackObj.buffer, 0, SocketObject.BufferSize,
                     SocketFlags.None, new AsyncCallback(LastReceiveCallBack), LastPackObj);
                 Logs.Log("上一个设备已连接");
             }
@@ -227,11 +221,11 @@ namespace IoTMcu
                 while (RunFlag)
                 {
                     Socket clientScoket = NextSocket.Accept();
-                    var NextPackObj = new StateObject
+                    var NextPackObj = new SocketObject
                     {
                         workSocket = clientScoket
                     };
-                    clientScoket.BeginReceive(NextPackObj.buffer, 0, StateObject.BufferSize,
+                    clientScoket.BeginReceive(NextPackObj.buffer, 0, SocketObject.BufferSize,
                     SocketFlags.None, new AsyncCallback(NextReceiveCallBack), NextPackObj);
                 }
             }
@@ -269,11 +263,11 @@ namespace IoTMcu
                 IPEndPoint localEndPoint = new IPEndPoint(IPAddress.None, IoTMcuMain.Config.LastSocket.Port);
                 ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 ServerSocket.Connect(localEndPoint);
-                var ServerPackObj = new StateObject
+                var ServerPackObj = new SocketObject
                 { 
                     workSocket = ServerSocket
                 };
-                ServerSocket.BeginReceive(ServerPackObj.buffer, 0, StateObject.BufferSize,
+                ServerSocket.BeginReceive(ServerPackObj.buffer, 0, SocketObject.BufferSize,
                     SocketFlags.None, new AsyncCallback(LastReceiveCallBack), ServerPackObj);
                 Logs.Log("IoT服务器已连接");
             }
