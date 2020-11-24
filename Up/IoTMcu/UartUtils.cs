@@ -1,4 +1,5 @@
 ﻿using Lib;
+using System;
 using System.IO.Ports;
 using System.Threading;
 
@@ -37,7 +38,6 @@ namespace IoTMcu
                                     Logs.Log("串口返回错误");
                                 break;
                             case 0x02:
-                                Logs.Log("显示内容已更新");
                                 if (data[6] == 'o' && data[7] == 'k')
                                     Logs.Log("显示内容已更新");
                                 else
@@ -66,8 +66,12 @@ namespace IoTMcu
 
         public void Write(byte[] data)
         {
+            var temp = new byte[data.Length + 6];
+            BuildPack(temp);
+            temp[5] = 0x02;
+            Array.Copy(data, 0, temp, 6, data.Length);
             if (serialPort.IsOpen)
-                serialPort.Write(data, 0, data.Length);
+                serialPort.Write(temp, 0, temp.Length);
             else
                 Logs.Log("串口未打开");
         }

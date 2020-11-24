@@ -23,6 +23,7 @@ void TaskUart(void *data)
                 printf("数据包错误\n");
                 continue;
             }
+            UARTRData[0] = 0;
             // printf("数据包类型%d\n", UARTRData[5]);
             switch (UARTRData[5])
             {

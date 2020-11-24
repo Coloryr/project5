@@ -68,6 +68,7 @@ namespace IoTMcu
                         showdelay = show.Time;
                         ShowImg = ShowDataList[show];
                         UpdateShow();
+                        IoTMcuMain.UartUtils.Write(ShowData);
                         updata = false;
                     }
                     Thread.Sleep(100);
@@ -97,22 +98,22 @@ namespace IoTMcu
 
                     if (temp == Red)
                     {
-                        temp2 |= (byte)(1 >> bit_);
+                        temp2 |= (byte)(1 << bit_);
                     }
                     else if (temp == Blue)
                     {
-                        temp1 |= (byte)(1 >> bit_);
+                        temp1 |= (byte)(1 << bit_);
                     }
                     // if (temp == Mix)
                     else
                     {
-                        temp2 |= (byte)(1 >> bit_);
-                        temp1 |= (byte)(1 >> bit_);
+                        temp2 |= (byte)(1 << bit_);
+                        temp1 |= (byte)(1 << bit_);
                     }
                     if (temp3 == 7)
                     {
-                        ShowData[bit + i * XCount] = temp1;
-                        ShowData[bit + BULLocal + i * XCount] = temp2;
+                        ShowData[i * XCount + XCount - bit - 1] = temp1;
+                        ShowData[BULLocal + i * XCount + XCount - bit - 1] = temp2;
                         temp3 = 0;
                     }
                     else
