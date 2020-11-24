@@ -98,6 +98,8 @@
                 <Button Content="选择字体" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="284,29,0,0" Height="18" Click="Font_Click"/>
                 <Image Margin="4,76,4,4" Name="ImgTest" Stretch="None"/>
                 <Button Content="刷新显示" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="363,29,0,0" Height="18" Click="ShowRe_Click"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="284,4,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Time}"
+                         VerticalAlignment="Top" Width="59"/>
             </Grid>
         </GroupBox>
 

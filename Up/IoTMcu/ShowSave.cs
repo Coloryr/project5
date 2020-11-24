@@ -127,7 +127,7 @@ namespace IoTMcu
                 }
             }
         }
-        public void SetShow(string data)
+        public void SetShow(string data, string data1)
         {
             List<ShowObj> list = JsonSerializer.Deserialize<List<ShowObj>>(data);
             var list1 = new DirectoryInfo(Local);
@@ -139,9 +139,11 @@ namespace IoTMcu
             foreach (var item in list)
             {
                 ShowList.Add(item.Index, item);
-                var str = JsonSerializer.Serialize(item);
-                File.WriteAllText(Local + item.Index + ".json", str);
             }
+            var temp = Convert.FromBase64String(data1);
+            PackDown PackDown = new();
+            MemoryStream stream = new MemoryStream(temp);
+            PackDown.UnZip(Local, stream);
         }
         public void Start()
         {

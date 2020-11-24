@@ -75,7 +75,7 @@ namespace IoTMcuEdit
             StateLable.Content = "未连接";
             StateLed.Fill = Brushes.Red;
 
-            SocketState(true);
+            //SocketState(true);
         }
         public void TaskDone(string name)
         {
@@ -178,7 +178,8 @@ namespace IoTMcuEdit
             index = ShowList.Count;
             ShowList.Add(new ShowObj
             {
-                Index = index
+                Index = index,
+                Name = "Show" + (index + 1)
             });
             ShowList[index].Bind(TempShowObj);
             显示列表.SelectedIndex = index;
@@ -293,11 +294,14 @@ namespace IoTMcuEdit
         private void SetShow_Click(object sender, RoutedEventArgs e)
         {
             var local = AppDomain.CurrentDomain.BaseDirectory + "TEMP/";
-            if (Directory.Exists(local))
+            if (!Directory.Exists(local))
             {
-                Directory.Delete(local);
+                Directory.CreateDirectory(local);
             }
-            Directory.CreateDirectory(local);
+            foreach (var item in Directory.GetFiles(local))
+            {
+                File.Delete(item);
+            }
             foreach (var item in ShowList)
             {
                 File.WriteAllText(local + item.Index + ".json", JsonConvert.SerializeObject(item));
@@ -306,18 +310,16 @@ namespace IoTMcuEdit
             }
             var packup = new PackUp();
             var temp = packup.ZipDirectory(local, local + "pack.zip");
-            if (temp == null)
+            if (!temp)
             {
                 App.ShowB("显示", "显示内容设置失败");
                 return;
             }
-            byte[] buffer = new byte[temp.length];
-            temp.Read(buffer, 0, buffer.length);
             var pack = new IoTPackObj
             {
                 Type = PackType.SetShow,
                 Data = JsonConvert.SerializeObject(ShowList),
-                Data1 = Convert.ToBase64String(buffer)
+                Data1 = Convert.ToBase64String(File.ReadAllBytes(local + "pack.zip"))
             };
             SocketUtils.SendNext(pack);
             App.ShowA("显示", "正在设置显示内容");

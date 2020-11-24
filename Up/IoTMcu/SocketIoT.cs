@@ -98,7 +98,7 @@ namespace IoTMcu
                         switch (obj.Type)
                         {
                             case PackType.SetShow:
-                                IoTMcuMain.Show.SetShow(obj.Data);
+                                IoTMcuMain.Show.SetShow(obj.Data, obj.Data1);
                                 SendNext(new IoTPackObj()
                                 {
                                     Type = PackType.SetShow
