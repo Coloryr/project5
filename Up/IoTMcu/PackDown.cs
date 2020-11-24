@@ -37,9 +37,8 @@ namespace IoTMcu
                     if (!string.IsNullOrEmpty(ent.Name))
                     {
                         fileName = Path.Combine(zipedFolder, ent.Name);
-                        fileName = fileName.Replace('/', '\\');//change by Mr.HopeGi
 
-                        if (fileName.EndsWith("\\"))
+                        if (fileName.EndsWith("/"))
                         {
                             Directory.CreateDirectory(fileName);
                             continue;

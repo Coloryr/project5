@@ -9,7 +9,7 @@ namespace IoTMcuEdit
         private string _Name = "Show1";
         private int _X = 0;
         private int _Y = 0;
-        private int _Time = 1000;
+        private int _Time = 10000;
         private int _Size = 16;
         private FontSelfColor _Color = FontSelfColor.RED;
         private string _FontType;

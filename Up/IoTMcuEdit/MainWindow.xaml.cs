@@ -304,7 +304,6 @@ namespace IoTMcuEdit
             }
             foreach (var item in ShowList)
             {
-                File.WriteAllText(local + item.Index + ".json", JsonConvert.SerializeObject(item));
                 var img = GenShow.Gen(TempShowObj, LcdObj);
                 img.Save(local + item.Index + ".jpg");
             }

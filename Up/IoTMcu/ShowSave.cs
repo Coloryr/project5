@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.IO;
-using System.Text.Json;
+using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace IoTMcu
 {
@@ -56,6 +55,7 @@ namespace IoTMcu
                 IoTMcuMain.IsBoot.WaitOne();
                 if (ShowList.Count == 0)
                 {
+                    updata = false;
                     Thread.Sleep(1000);
                 }
                 else
@@ -65,6 +65,7 @@ namespace IoTMcu
                         if (showindex >= ShowList.Count)
                             showindex = 0;
                         var show = ShowList[showindex];
+                        showdelay = show.Time;
                         ShowImg = ShowDataList[show];
                         UpdateShow();
                         updata = false;
@@ -85,32 +86,37 @@ namespace IoTMcu
             Logs.Log("更新显示");
             for (int i = 0; i < IoTMcuMain.Config.Height; i++)
             {
+                byte temp1 = 0;
+                byte temp2 = 0;
+                byte temp3 = 0;
                 for (int j = 0; j < IoTMcuMain.Config.Width; j++)
                 {
                     var temp = ShowImg.GetPixel(j, i);
                     int bit = j / 8;
                     int bit_ = j % 8;
+
                     if (temp == Red)
                     {
-                        ShowData[bit + i * XCount] &= (byte)~(1 << bit_);
-                        ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
+                        temp2 |= (byte)(1 >> bit_);
                     }
                     else if (temp == Blue)
                     {
-                        ShowData[bit + i * XCount] |= (byte)(1 << bit_);
-                        ShowData[bit + BULLocal + i * XCount] &= (byte)~(1 << bit_);
+                        temp1 |= (byte)(1 >> bit_);
                     }
-                    else if (temp == Mix)
-                    {
-                        ShowData[bit + i * XCount] &= (byte)~(1 << bit_);
-                        ShowData[bit + BULLocal + i * XCount] &= (byte)~(1 << bit_);
-                    }
+                    // if (temp == Mix)
                     else
                     {
-                        Console.WriteLine(temp.ToString());
-                        ShowData[bit + i * XCount] |= (byte)(1 << bit_);
-                        ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
+                        temp2 |= (byte)(1 >> bit_);
+                        temp1 |= (byte)(1 >> bit_);
                     }
+                    if (temp3 == 7)
+                    {
+                        ShowData[bit + i * XCount] = temp1;
+                        ShowData[bit + BULLocal + i * XCount] = temp2;
+                        temp3 = 0;
+                    }
+                    else
+                        temp3++;
                 }
             }
             string valueString = "";
@@ -129,21 +135,44 @@ namespace IoTMcu
         }
         public void SetShow(string data, string data1)
         {
-            List<ShowObj> list = JsonSerializer.Deserialize<List<ShowObj>>(data);
+            List<ShowObj> list = JsonConvert.DeserializeObject<List<ShowObj>>(data);
             var list1 = new DirectoryInfo(Local);
             foreach (var item in list1.GetFiles())
             {
                 File.Delete(item.FullName);
             }
-            ShowList.Clear();
             foreach (var item in list)
             {
-                ShowList.Add(item.Index, item);
+                var str = JsonConvert.SerializeObject(item);
+                File.WriteAllText(Local + item.Index + ".json", str);
             }
             var temp = Convert.FromBase64String(data1);
             PackDown PackDown = new();
             MemoryStream stream = new MemoryStream(temp);
             PackDown.UnZip(Local, stream);
+            GetShow();
+        }
+        private void GetShow()
+        {
+            foreach (var item in ShowDataList)
+            {
+                item.Value.Dispose();
+            }
+            ShowList.Clear();
+            ShowDataList.Clear();
+            var list = new DirectoryInfo(Local);
+            foreach (var item in list.GetFiles())
+            {
+                if (item.FullName.EndsWith(".json"))
+                {
+                    var temp = JsonConvert.DeserializeObject<ShowObj>(File.ReadAllText(item.FullName));
+                    if (temp != null)
+                    {
+                        ShowList.Add(temp.Index, temp);
+                        ShowDataList.Add(temp, new Bitmap(Local + temp.Index + ".jpg"));
+                    }
+                }
+            }
         }
         public void Start()
         {
@@ -163,21 +192,8 @@ namespace IoTMcu
                 Logs.Log($"显示宽度错误{Bank}");
                 return;
             }
-            var list = new DirectoryInfo(Local);
-            foreach (var item in ShowDataList)
-            {
-                item.Value.Dispose();
-            }
-            ShowDataList.Clear();
-            foreach (var item in list.GetFiles())
-            {
-                var temp = JsonSerializer.Deserialize<ShowObj>(File.ReadAllText(item.FullName));
-                if (temp != null)
-                {
-                    ShowList.Add(temp.Index, temp);
-                    ShowDataList.Add(temp, new Bitmap(Local + temp.Index + ".jpg"));
-                }
-            }
+
+            GetShow();
 
             XCount = IoTMcuMain.Config.Width / 8;
             YCount = IoTMcuMain.Config.Height / 8;
