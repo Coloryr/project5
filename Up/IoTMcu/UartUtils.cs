@@ -38,10 +38,13 @@ namespace IoTMcu
                                     Logs.Log("串口返回错误");
                                 break;
                             case 0x02:
-                                if (data[6] == 'o' && data[7] == 'k')
-                                    Logs.Log("显示内容已更新");
-                                else
-                                    Logs.Log("串口返回错误");
+                                if (data.Length >= 8)
+                                {
+                                    if (data[6] == 'o' && data[7] == 'k')
+                                        Logs.Log("显示内容已更新");
+                                    else
+                                        Logs.Log("串口返回错误");
+                                }
                                 break;
                         }
                     }

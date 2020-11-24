@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
@@ -24,6 +26,9 @@ namespace IoTMcu
         private Color Red;
         private Color Blue;
         private Color Mix;
+
+        private BitArray RedBitArray;
+        private BitArray BulBitArray;
 
         bool updata = true;
 
@@ -87,41 +92,62 @@ namespace IoTMcu
             Logs.Log("更新显示");
             for (int i = 0; i < IoTMcuMain.Config.Height; i++)
             {
-                byte temp1 = 0;
-                byte temp2 = 0;
-                byte temp3 = 0;
                 for (int j = 0; j < IoTMcuMain.Config.Width; j++)
                 {
                     var temp = ShowImg.GetPixel(j, i);
-                    int bit = j / 8;
-                    int bit_ = j % 8;
 
                     if (temp == Red)
                     {
-                        temp2 |= (byte)(1 << bit_);
+                        RedBitArray[i * IoTMcuMain.Config.Width + j] = false;
+                        BulBitArray[i * IoTMcuMain.Config.Width + j] = true;
                     }
                     else if (temp == Blue)
                     {
-                        temp1 |= (byte)(1 << bit_);
+                        RedBitArray[i * IoTMcuMain.Config.Width + j] = false;
+                        BulBitArray[i * IoTMcuMain.Config.Width + j] = true;
                     }
-                    // if (temp == Mix)
+                    else if (temp == Mix)
+                    {
+                        RedBitArray[i * IoTMcuMain.Config.Width + j] = false;
+                        BulBitArray[i * IoTMcuMain.Config.Width + j] = false;
+                    }
                     else
                     {
-                        temp2 |= (byte)(1 << bit_);
-                        temp1 |= (byte)(1 << bit_);
+                        RedBitArray[i * IoTMcuMain.Config.Width + j] = true;
+                        BulBitArray[i * IoTMcuMain.Config.Width + j] = true;
                     }
-                    if (temp3 == 7)
-                    {
-                        ShowData[i * XCount + XCount - bit - 1] = temp1;
-                        ShowData[BULLocal + i * XCount + XCount - bit - 1] = temp2;
-                        temp3 = 0;
-                    }
-                    else
-                        temp3++;
                 }
             }
             string valueString = "";
             int a = 0;
+            int index = 0;
+            for (int i = 0; i < IoTMcuMain.Config.Width * IoTMcuMain.Config.Height; i++)
+            {
+                a++;
+                valueString += RedBitArray[i] ? "1" : "0";
+                if (a == 8)
+                {
+                    ShowData[index] = Convert.ToByte(valueString, 2);
+                    index++;
+                    valueString = "";
+                    a = 0;
+                }
+            }
+            index = 0;
+            a = 0;
+            for (int i = 0; i < IoTMcuMain.Config.Width * IoTMcuMain.Config.Height; i++)
+            {
+                a++;
+                valueString += BulBitArray[i] ? "1" : "0";
+                if (a == 8)
+                {
+                    ShowData[index + IoTMcuMain.Config.Height * XCount] = Convert.ToByte(valueString, 2);
+                    index++;
+                    valueString = "";
+                    a = 0;
+                }
+            }
+            valueString = "";
             foreach (var item in ShowData)
             {
                 a++;
@@ -136,6 +162,7 @@ namespace IoTMcu
         }
         public void SetShow(string data, string data1)
         {
+            IoTMcuMain.IsBoot.Reset();
             List<ShowObj> list = JsonConvert.DeserializeObject<List<ShowObj>>(data);
             var list1 = new DirectoryInfo(Local);
             foreach (var item in list1.GetFiles())
@@ -152,6 +179,8 @@ namespace IoTMcu
             MemoryStream stream = new MemoryStream(temp);
             PackDown.UnZip(Local, stream);
             GetShow();
+            updata = true;
+            IoTMcuMain.IsBoot.Set();
         }
         private void GetShow()
         {
@@ -199,9 +228,12 @@ namespace IoTMcu
             XCount = IoTMcuMain.Config.Width / 8;
             YCount = IoTMcuMain.Config.Height / 8;
 
+            RedBitArray = new(IoTMcuMain.Config.Height * IoTMcuMain.Config.Width);
+            BulBitArray = new(IoTMcuMain.Config.Height * IoTMcuMain.Config.Width);
+
             ShowData = new byte[IoTMcuMain.Config.Height * XCount * 2];
 
-            BULLocal = IoTMcuMain.Config.Height * XCount;
+            BULLocal = IoTMcuMain.Config.Height * IoTMcuMain.Config.Width;
 
             var data = new byte[8];
             UartUtils.BuildPack(data);
