@@ -15,7 +15,6 @@ namespace IoTMcu
         public SocketSave LastSocket { get; set; }
         public SocketSave ServerSocket { get; set; }
         public bool NeedServer { get; set; }
-        public List<FontSave> FontList { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
     }
@@ -23,7 +22,6 @@ namespace IoTMcu
     {
         public string Name { get; set; }
         public int Index { get; set; }
-        //public ShowType Type { get; set; }
         public string FontType { get; set; }
         public int Size { get; set; }
         public FontSelfColor Color { get; set; }

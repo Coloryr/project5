@@ -15,7 +15,6 @@ namespace IoTMcu
         public static ConfigObj Config;
         public static SocketIoT SocketIoT;
         public static ShowSave Show;
-        public static FontSave Font;
         public static UartUtils UartUtils;
 
         public const string ConfigName = "config.json";
@@ -26,7 +25,6 @@ namespace IoTMcu
             Logs.Log("Read Config");
             Config = ConfigRead.Read(ConfigName, new ConfigObj
             {
-                FontList = new List<FontSave>(),
                 LastSocket = new SocketSave
                 {
                     IP = "192.168.1.1",
@@ -50,8 +48,6 @@ namespace IoTMcu
             UartUtils = new();
             Logs.Log("Start Socket");
             SocketIoT = new();
-            Logs.Log("Start Font");
-            Font = new();
             Logs.Log("Start Show");
             Show = new();
             Logs.Log("Start!!!");

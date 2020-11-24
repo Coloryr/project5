@@ -43,7 +43,6 @@ namespace IoTMcu
             {
                 await FileStream.DisposeAsync();
                 IoTMcuMain.SocketIoT.TaskDone(name);
-                IoTMcuMain.Font.Start();
                 IoTMcuMain.IsBoot.Set();
             }
             SocketIoT.SendNext(Pack, socket);

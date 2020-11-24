@@ -2,7 +2,7 @@
 {
     public enum PackType
     {
-        Info, SetInfo, SetShow, Test, AddFont, DeleteFont, ListShow, ListFont
+        Info, SetInfo, SetShow, Test, ListShow, ListFont
     }
     public class IoTPackObj
     {

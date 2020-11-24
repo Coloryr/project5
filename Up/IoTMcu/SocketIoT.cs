@@ -97,26 +97,6 @@ namespace IoTMcu
 
                         switch (obj.Type)
                         {
-                            case PackType.AddFont:
-                                if (DownloadTasks.ContainsKey(obj.Data))
-                                {
-                                    var data = Convert.FromBase64String(obj.Data1);
-                                    DownloadTasks[obj.Data].Write(data);
-                                }
-                                else
-                                {
-                                    var Task = new DownloadFile
-                                    {
-                                        name = obj.Data,
-                                        local = FontSave.Local + obj.Data,
-                                        size = obj.Data3,
-                                        socket = ThisSocket,
-                                        type = PackType.AddFont
-                                    };
-                                    DownloadTasks.Add(obj.Data, Task);
-                                    Task.Start();
-                                }
-                                break;
                             case PackType.SetShow:
                                 IoTMcuMain.Show.SetShow(obj.Data);
                                 SendNext(new IoTPackObj()
@@ -124,21 +104,13 @@ namespace IoTMcu
                                     Type = PackType.SetShow
                                 }, ThisSocket);
                                 break;
-                            case PackType.DeleteFont:
-                                IoTMcuMain.Font.RemoveFont(obj.Data, ThisSocket);
-                                pack.Type = PackType.DeleteFont;
-                                pack.Data = obj.Data;
-                                SendNext(pack, ThisSocket);
-                                break;
                             case PackType.Info:
                                 pack.Type = PackType.Info;
                                 pack.Data = IoTMcuMain.Config.Name;
                                 pack.Data3 = IoTMcuMain.Config.Width;
                                 pack.Data4 = IoTMcuMain.Config.Height;
-                                var list = IoTMcuMain.Font.FontFiles;
-                                var list1 = IoTMcuMain.Show.ShowList.Values;
+                                var list = IoTMcuMain.Show.ShowList.Values;
                                 pack.Data1 = JsonConvert.SerializeObject(list);
-                                pack.Data2 = JsonConvert.SerializeObject(list1);
                                 SendNext(pack, ThisSocket);
                                 break;
                             case PackType.SetInfo:
@@ -150,16 +122,10 @@ namespace IoTMcu
                                 IoTMcuMain.Show.Start();
                                 IoTMcuMain.IsBoot.Set();
                                 break;
-                            case PackType.ListFont:
-                                pack.Type = PackType.ListFont;
-                                list = IoTMcuMain.Font.FontFiles;
-                                pack.Data = JsonConvert.SerializeObject(list);
-                                SendNext(pack, ThisSocket);
-                                break;
                             case PackType.ListShow:
                                 pack.Type = PackType.ListShow;
-                                list1 = IoTMcuMain.Show.ShowList.Values;
-                                pack.Data = JsonConvert.SerializeObject(list1);
+                                list = IoTMcuMain.Show.ShowList.Values;
+                                pack.Data = JsonConvert.SerializeObject(list);
                                 SendNext(pack, ThisSocket);
                                 break;
                         }

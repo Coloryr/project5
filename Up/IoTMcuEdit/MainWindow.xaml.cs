@@ -1,12 +1,11 @@
 ﻿using Lib;
-using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -20,10 +19,8 @@ namespace IoTMcuEdit
         public System.Windows.Forms.NotifyIcon notifyIcon;
         private SocketUtils SocketUtils;
         private int index;
-        private OpenFileDialog openFileDialog = new();
 
         private Dictionary<string, DownloadFile> DownloadTasks = new();
-        public ObservableCollection<string> FontList { get; set; } = new();
         public ObservableCollection<ShowObj> ShowList { get; set; } = new();
         public ShowObj TempShowObj { get; set; } = new();
         public LcdObj LcdObj { get; set; } = new()
@@ -63,8 +60,6 @@ namespace IoTMcuEdit
 
             SocketUtils = new SocketUtils(SocketState, SocketData);
 
-            字体列表.ItemsSource = FontList;
-            字体样式.ItemsSource = FontList;
             显示列表.ItemsSource = ShowList;
 
             ShowList.Add(new ShowObj());
@@ -74,14 +69,13 @@ namespace IoTMcuEdit
             显示列表.SelectedIndex = 0;
 
             lock1.IsEnabled =
-            lock2.IsEnabled =
             lock3.IsEnabled =
             lock4.IsEnabled = false;
             连接.Content = "连接";
             StateLable.Content = "未连接";
             StateLed.Fill = Brushes.Red;
 
-            //SocketState(true);
+            SocketState(true);
         }
         public void TaskDone(string name)
         {
@@ -104,45 +98,21 @@ namespace IoTMcuEdit
                         LcdObj.Y = obj.Data4;
                     });
 
-                    var list = JsonConvert.DeserializeObject<List<string>>(obj.Data1);
-                    Dispatcher.Invoke(() =>
-                    {
-                        FontList.Clear();
-                        foreach (var item in list)
-                        {
-                            FontList.Add(item);
-                        }
-                    });
-                    var list1 = JsonConvert.DeserializeObject<List<ShowObj>>(obj.Data2);
+                    var list = JsonConvert.DeserializeObject<List<ShowObj>>(obj.Data1);
                     Dispatcher.Invoke(() =>
                     {
                         ShowList.Clear();
-                        foreach (var item in list1)
+                        foreach (var item in list)
                         {
                             ShowList.Add(item);
                         }
                     });
                     App.ShowA("屏幕", "配置已读取");
                     break;
-                case PackType.AddFont:
-                    if (DownloadTasks.ContainsKey(obj.Data))
-                    {
-                        DownloadTasks[obj.Data].Send();
-                    }
-                    break;
-                case PackType.ListFont:
-                    list = JsonConvert.DeserializeObject<List<string>>(obj.Data);
-                    FontList.Clear();
-                    foreach (var item in list)
-                    {
-                        FontList.Add(item);
-                    }
-                    App.ShowA("屏幕", "字体已读取");
-                    break;
                 case PackType.ListShow:
-                    list1 = JsonConvert.DeserializeObject<List<ShowObj>>(obj.Data);
+                    list = JsonConvert.DeserializeObject<List<ShowObj>>(obj.Data);
                     ShowList.Clear();
-                    foreach (var item in list1)
+                    foreach (var item in list)
                     {
                         ShowList.Add(item);
                     }
@@ -150,14 +120,6 @@ namespace IoTMcuEdit
                     break;
                 case PackType.SetShow:
                     App.ShowA("显示", "显示内容已设置");
-                    break;
-                case PackType.DeleteFont:
-                    if (obj.Data == "ok")
-                        App.ShowA("字体", "字体已删除");
-                    else if (obj.Data == "no")
-                        App.ShowB("字体", "字体删除失败");
-                    else
-                        App.ShowB("字体", "其他错误");
                     break;
             }
         }
@@ -168,7 +130,6 @@ namespace IoTMcuEdit
                 if (state)
                 {
                     lock1.IsEnabled =
-                    lock2.IsEnabled =
                     lock3.IsEnabled =
                     lock4.IsEnabled = true;
                     连接.Content = "断开";
@@ -185,7 +146,6 @@ namespace IoTMcuEdit
                     }
                     DownloadTasks.Clear();
                     lock1.IsEnabled =
-                    lock2.IsEnabled =
                     lock3.IsEnabled =
                     lock4.IsEnabled = false;
                     连接.Content = "连接";
@@ -213,49 +173,6 @@ namespace IoTMcuEdit
                 SocketUtils.SetConnect(LcdObj.IP, LcdObj.Port);
             }
         }
-        private void AddFont(object sender, RoutedEventArgs e)
-        {
-            openFileDialog.Title = "系统文字文件";
-            openFileDialog.Filter = "ttf文字|*.ttf";
-            openFileDialog.FileName = string.Empty;
-            openFileDialog.FilterIndex = 1;
-            openFileDialog.Multiselect = false;
-            openFileDialog.RestoreDirectory = true;
-            openFileDialog.DefaultExt = "ttf";
-            if (openFileDialog.ShowDialog() == false)
-            {
-                return;
-            }
-            FileInfo info = new FileInfo(openFileDialog.FileName);
-            if (DownloadTasks.ContainsKey(info.Name))
-            {
-                App.ShowB("字体", "这个字体正在上传");
-                return;
-            }
-            var file = new DownloadFile()
-            {
-                local = info.FullName,
-                name = info.Name,
-                SocketUtils = SocketUtils,
-                type = PackType.AddFont
-            };
-            file.Start();
-            DownloadTasks.Add(info.Name, file);
-            App.ShowA("字体", "正在上传字体" + info.Name);
-        }
-        private void DeleteFont(object sender, RoutedEventArgs e)
-        {
-            if (显示列表.SelectedItem == null)
-                return;
-            var name = (string)显示列表.SelectedItem;
-            var pack = new IoTPackObj
-            {
-                Type = PackType.DeleteFont,
-                Data = name
-            };
-            SocketUtils.SendNext(pack);
-            App.ShowA("字体", "删除字体" + name);
-        }
         private void AddShow(object sender, RoutedEventArgs e)
         {
             index = ShowList.Count;
@@ -273,7 +190,6 @@ namespace IoTMcuEdit
                 return;
             index = 显示列表.SelectedIndex;
             var data = (ShowObj)显示列表.SelectedItem;
-            字体样式.SelectedItem = data.FontType;
             data.Bind(TempShowObj);
             App.ShowA(data.Name, "正在修改");
         }
@@ -376,20 +292,55 @@ namespace IoTMcuEdit
 
         private void SetShow_Click(object sender, RoutedEventArgs e)
         {
+            var local = AppDomain.CurrentDomain.BaseDirectory + "TEMP/";
+            if (Directory.Exists(local))
+            {
+                Directory.Delete(local);
+            }
+            Directory.CreateDirectory(local);
+            foreach (var item in ShowList)
+            {
+                File.WriteAllText(local + item.Index + ".json", JsonConvert.SerializeObject(item));
+                var img = GenShow.Gen(TempShowObj, LcdObj);
+                img.Save(local + item.Index + ".jpg");
+            }
+            var packup = new PackUp();
+            var temp = packup.ZipDirectory(local, local + "pack.zip");
+            if (temp == null)
+            {
+                App.ShowB("显示", "显示内容设置失败");
+                return;
+            }
+            byte[] buffer = new byte[temp.length];
+            temp.Read(buffer, 0, buffer.length);
             var pack = new IoTPackObj
             {
                 Type = PackType.SetShow,
-                Data = JsonConvert.SerializeObject(ShowList)
+                Data = JsonConvert.SerializeObject(ShowList),
+                Data1 = Convert.ToBase64String(buffer)
             };
             SocketUtils.SendNext(pack);
             App.ShowA("显示", "正在设置显示内容");
         }
-
-        private void 字体样式_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ShowRe_Click(object sender, RoutedEventArgs e)
         {
-            if (字体样式.SelectedItem == null)
-                return;
-            TempShowObj.FontType = (string)字体样式.SelectedItem;
+            var img = GenShow.Gen(TempShowObj, LcdObj);
+            ImageSource wpfBitmap = Imaging.CreateBitmapSourceFromHBitmap(
+               img.GetHbitmap(),
+                IntPtr.Zero,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+            ImgTest.Source = wpfBitmap;
+        }
+
+        private void Font_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FontDialog fontDialog = new();
+            if (fontDialog.ShowDialog() != System.Windows.Forms.DialogResult.Cancel)
+            {
+                TempShowObj.FontType = fontDialog.Font.FontFamily.Name;
+                TempShowObj.Size = (int)fontDialog.Font.Size;
+            }
         }
     }
 }

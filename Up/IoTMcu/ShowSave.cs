@@ -14,9 +14,9 @@ namespace IoTMcu
         public static readonly string Local = IoTMcuMain.Local + "ShowList/";
 
         public static Bitmap ShowImg;
-        public static Graphics Graphics;
 
         public readonly Dictionary<int, ShowObj> ShowList = new();
+        public readonly Dictionary<ShowObj, Bitmap> ShowDataList = new();
 
         private Thread UpdateThread;
         private byte[] ShowData;
@@ -45,15 +45,6 @@ namespace IoTMcu
             {
                 Directory.CreateDirectory(Local);
             }
-            var list = new DirectoryInfo(Local);
-            foreach (var item in list.GetFiles())
-            {
-                var temp = JsonSerializer.Deserialize<ShowObj>(File.ReadAllText(item.FullName));
-                if (temp != null)
-                {
-                    ShowList.Add(temp.Index, temp);
-                }
-            }
             Start();
             UpdateThread.Start();
         }
@@ -74,13 +65,9 @@ namespace IoTMcu
                         if (showindex >= ShowList.Count)
                             showindex = 0;
                         var show = ShowList[showindex];
-                        ClearShow();
-                        //画汉字
-                        IoTMcuMain.Font.GenShow(Graphics, show);
-                        showdelay = show.Time;
+                        ShowImg = ShowDataList[show];
                         UpdateShow();
                         updata = false;
-                        ShowImg.Save("test.jpg");
                     }
                     Thread.Sleep(100);
                     showdelay -= 100;
@@ -91,11 +78,6 @@ namespace IoTMcu
                     }
                 }
             }
-        }
-
-        private void ClearShow()
-        {
-            Graphics.Clear(Color.White);
         }
 
         private void UpdateShow()
@@ -163,10 +145,6 @@ namespace IoTMcu
         }
         public void Start()
         {
-            if (Graphics != null)
-            {
-                Graphics.Dispose();
-            }
             if (ShowImg != null)
             {
                 ShowImg.Dispose();
@@ -183,21 +161,21 @@ namespace IoTMcu
                 Logs.Log($"显示宽度错误{Bank}");
                 return;
             }
-            ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
-
-            Graphics = Graphics.FromImage(ShowImg);
-
-            Graphics.PageUnit = GraphicsUnit.Pixel;
-            Graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
-
-            ClearShow();
-
-            Graphics.FillRectangle(Brushes.Red,
-                new Rectangle(0, 0, 8, 8));
-            Graphics.FillRectangle(Brushes.Blue,
-                new Rectangle(8, 8, 8, 8));
-            Graphics.FillRectangle(Brushes.Lime,
-                new Rectangle(24, 0, 8, 8));
+            var list = new DirectoryInfo(Local);
+            foreach (var item in ShowDataList)
+            {
+                item.Value.Dispose();
+            }
+            ShowDataList.Clear();
+            foreach (var item in list.GetFiles())
+            {
+                var temp = JsonSerializer.Deserialize<ShowObj>(File.ReadAllText(item.FullName));
+                if (temp != null)
+                {
+                    ShowList.Add(temp.Index, temp);
+                    ShowDataList.Add(temp, new Bitmap(Local + temp.Index + ".jpg"));
+                }
+            }
 
             XCount = IoTMcuMain.Config.Width / 8;
             YCount = IoTMcuMain.Config.Height / 8;

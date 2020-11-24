@@ -11,7 +11,7 @@
     </Window.Resources>
     <Grid>
         <Rectangle Fill="#FFF4F4F5" Stroke="#CC5EBDD3" StrokeThickness="5"/>
-        <GroupBox Header="屏幕连接" HorizontalAlignment="Left" Height="93" VerticalAlignment="Top" Width="228" Margin="10,10,0,0">
+        <GroupBox Header="屏幕连接" HorizontalAlignment="Left" Height="97" VerticalAlignment="Top" Width="228" Margin="10,10,0,0">
             <Grid>
                 <Button Content="连接" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74"
                         Margin="65,47,0,0" Height="18" Click="Connect_Click" Name="连接"/>
@@ -28,38 +28,19 @@
                          VerticalAlignment="Top" Width="173" Name="Port"/>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="lock1" Header="屏幕设置" HorizontalAlignment="Left" Height="97" VerticalAlignment="Top" Width="228" Margin="10,108,0,0">
+        <GroupBox x:Name="lock1" Header="屏幕设置" HorizontalAlignment="Center" Height="97" VerticalAlignment="Top" Width="214" Margin="0,10,0,0">
             <Grid>
                 <Label Content="长度" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <Label Content="高度" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,0,0,0"/>
+                <Label Content="高度" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="106,0,0,0"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="34,4,0,0" TextWrapping="Wrap" Text="{Binding LcdObj.X}"
                          VerticalAlignment="Top" Width="64"/>
-                <TextBox HorizontalAlignment="Left" Height="18" Margin="154,4,0,0" TextWrapping="Wrap" Text="{Binding LcdObj.Y}"
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="140,4,0,0" TextWrapping="Wrap" Text="{Binding LcdObj.Y}"
                          VerticalAlignment="Top" Width="64"/>
-                <Button Content="设置屏幕" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="144,50,0,0" 
+                <Button Content="设置屏幕" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="130,50,0,0" 
                         Height="18" Name="屏幕设置" Click="LcdSet_Click"/>
                 <Label Content="名字" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,22,0,0"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="34,0,0,0" TextWrapping="Wrap" Text="{Binding LcdObj.Name}"
-                         VerticalAlignment="Center" Width="184"/>
-            </Grid>
-        </GroupBox>
-        <GroupBox x:Name="lock2" Header="字体列表" HorizontalAlignment="Left" Height="195" VerticalAlignment="Top" Width="214" Margin="243,10,0,0">
-            <Grid>
-                <ListView HorizontalAlignment="Left" Height="138" VerticalAlignment="Top" Width="202" Margin="4,4,0,0" Name="字体列表">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="字体" Width="180" DisplayMemberBinding="{Binding StringFormat=value}"/>
-                        </GridView>
-                    </ListView.View>
-                    <ListView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="添加" Click="AddFont"/>
-                            <MenuItem Header="删除" Click="DeleteFont"/>
-                        </ContextMenu>
-                    </ListView.ContextMenu>
-                </ListView>
-                <Button Content="刷新字体" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="132,147,0,0"
-                        Height="18" Name="字体刷新" Click="FontReload_Click"/>
+                         VerticalAlignment="Center" Width="170"/>
             </Grid>
         </GroupBox>
         <GroupBox x:Name="lock3" Header="显示列表" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Width="214" Margin="462,10,0,0">
@@ -85,7 +66,7 @@
                 <Button Content="设置显示" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="53,252,0,0" Height="18" Click="SetShow_Click"/>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="lock4" Header="显示修改" HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="447" Margin="10,210,0,0">
+        <GroupBox x:Name="lock4" Header="显示修改" HorizontalAlignment="Left" Height="198" VerticalAlignment="Top" Width="447" Margin="10,112,0,0">
             <Grid>
                 <Button Content="设置内容" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="363,54,0,0" Height="18" Click="Setting_Click"/>
                 <Label Content="名字" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -98,13 +79,11 @@
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="186,4,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Y}"
                          VerticalAlignment="Top" Width="40"/>
                 <Label Content="显示时间" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="226,0,0,0"/>
-                <TextBox HorizontalAlignment="Left" Height="18" Margin="284,4,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Time}"
-                         VerticalAlignment="Top" Width="59"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="131,30,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.FontType}"
+                         VerticalAlignment="Top" Width="148"/>
                 <Label Content="大小" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0"/>
 
-                <Label Content="字体样式" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="261,0,0,0"/>
-                <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="118" Margin="319,0,0,0"
-                          Height="20" IsReadOnly="True" Name="字体样式" SelectionChanged="字体样式_SelectionChanged"/>
+                <Label Content="字体样式" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="74,25,0,0"/>
                 <Label Content="显示内容" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,50,0,0"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="58,54,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Text}"
                          VerticalAlignment="Top" Width="300"/>
@@ -114,8 +93,11 @@
                     <RadioButton Content="B" Style="{DynamicResource RadioButton_Middle}" IsChecked="{Binding Path=TempShowObj.Color,Converter={StaticResource FontColorConverter},ConverterParameter=1}" Margin="20,0,39,0"/>
                     <RadioButton Content="C" Style="{DynamicResource RadioButton_Right}" IsChecked="{Binding Path=TempShowObj.Color,Converter={StaticResource FontColorConverter},ConverterParameter=2}" Margin="40,0,19,0"/>
                 </Grid>
-                <TextBox HorizontalAlignment="Left" Height="18" Margin="34,0,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Size}"
-                         VerticalAlignment="Center" Width="40"/>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="34,30,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Size}"
+                         VerticalAlignment="Top" Width="40"/>
+                <Button Content="选择字体" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="284,29,0,0" Height="18" Click="Font_Click"/>
+                <Image Margin="4,76,4,4" Name="ImgTest" Stretch="None"/>
+                <Button Content="刷新显示" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="363,29,0,0" Height="18" Click="ShowRe_Click"/>
             </Grid>
         </GroupBox>
 
