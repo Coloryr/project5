@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
@@ -93,8 +95,7 @@ namespace IoTMcu
 
         private void ClearShow()
         {
-            Graphics.FillRectangle(Brushes.White,
-               new Rectangle(0, 0, IoTMcuMain.Config.Width, IoTMcuMain.Config.Height));
+            Graphics.Clear(Color.White);
         }
 
         private void UpdateShow()
@@ -183,9 +184,9 @@ namespace IoTMcu
                 return;
             }
             ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
+
             Graphics = Graphics.FromImage(ShowImg);
-            Graphics.SmoothingMode = SmoothingMode.None;
-            Graphics.InterpolationMode = InterpolationMode.Low;
+
             Graphics.PageUnit = GraphicsUnit.Pixel;
             Graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
 

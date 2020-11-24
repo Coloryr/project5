@@ -1,11 +1,12 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v5.0",
+    "name": ".NETCoreApp,Version=v5.0/linux-arm",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
-    ".NETCoreApp,Version=v5.0": {
+    ".NETCoreApp,Version=v5.0": {},
+    ".NETCoreApp,Version=v5.0/linux-arm": {
       "IoTMcu/1.0.0": {
         "dependencies": {
           "Costura.Fody": "4.1.0",
@@ -51,14 +52,6 @@
             "assemblyVersion": "5.0.0.0",
             "fileVersion": "5.0.20.51904"
           }
-        },
-        "runtimeTargets": {
-          "runtimes/win/lib/netcoreapp3.0/Microsoft.Win32.SystemEvents.dll": {
-            "rid": "win",
-            "assetType": "runtime",
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.20.51904"
-          }
         }
       },
       "Newtonsoft.Json/12.0.3": {
@@ -70,32 +63,14 @@
         }
       },
       "runtime.linux-arm.runtime.native.System.IO.Ports/5.0.0-rtm.20519.4": {
-        "runtimeTargets": {
+        "native": {
           "runtimes/linux-arm/native/libSystem.IO.Ports.Native.so": {
-            "rid": "linux-arm",
-            "assetType": "native",
             "fileVersion": "0.0.0.0"
           }
         }
       },
-      "runtime.linux-arm64.runtime.native.System.IO.Ports/5.0.0-rtm.20519.4": {
-        "runtimeTargets": {
-          "runtimes/linux-arm64/native/libSystem.IO.Ports.Native.so": {
-            "rid": "linux-arm64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "runtime.linux-x64.runtime.native.System.IO.Ports/5.0.0-rtm.20519.4": {
-        "runtimeTargets": {
-          "runtimes/linux-x64/native/libSystem.IO.Ports.Native.so": {
-            "rid": "linux-x64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
+      "runtime.linux-arm64.runtime.native.System.IO.Ports/5.0.0-rtm.20519.4": {},
+      "runtime.linux-x64.runtime.native.System.IO.Ports/5.0.0-rtm.20519.4": {},
       "runtime.native.System.IO.Ports/5.0.0": {
         "dependencies": {
           "runtime.linux-arm.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4",
@@ -104,15 +79,7 @@
           "runtime.osx-x64.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4"
         }
       },
-      "runtime.osx-x64.runtime.native.System.IO.Ports/5.0.0-rtm.20519.4": {
-        "runtimeTargets": {
-          "runtimes/osx-x64/native/libSystem.IO.Ports.Native.dylib": {
-            "rid": "osx-x64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
+      "runtime.osx-x64.runtime.native.System.IO.Ports/5.0.0-rtm.20519.4": {},
       "System.CodeDom/5.0.0": {
         "runtime": {
           "lib/netstandard2.0/System.CodeDom.dll": {
@@ -139,21 +106,7 @@
           "Microsoft.Win32.SystemEvents": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.0/System.Drawing.Common.dll": {
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.20.51904"
-          }
-        },
-        "runtimeTargets": {
           "runtimes/unix/lib/netcoreapp3.0/System.Drawing.Common.dll": {
-            "rid": "unix",
-            "assetType": "runtime",
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.20.51904"
-          },
-          "runtimes/win/lib/netcoreapp3.0/System.Drawing.Common.dll": {
-            "rid": "win",
-            "assetType": "runtime",
             "assemblyVersion": "5.0.0.0",
             "fileVersion": "5.0.20.51904"
           }
@@ -165,27 +118,7 @@
           "runtime.native.System.IO.Ports": "5.0.0"
         },
         "runtime": {
-          "lib/netstandard2.0/System.IO.Ports.dll": {
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.20.51904"
-          }
-        },
-        "runtimeTargets": {
           "runtimes/linux/lib/netstandard2.0/System.IO.Ports.dll": {
-            "rid": "linux",
-            "assetType": "runtime",
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.20.51904"
-          },
-          "runtimes/osx/lib/netstandard2.0/System.IO.Ports.dll": {
-            "rid": "osx",
-            "assetType": "runtime",
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.20.51904"
-          },
-          "runtimes/win/lib/netstandard2.0/System.IO.Ports.dll": {
-            "rid": "win",
-            "assetType": "runtime",
             "assemblyVersion": "5.0.0.0",
             "fileVersion": "5.0.20.51904"
           }
@@ -199,14 +132,6 @@
         },
         "runtime": {
           "lib/netstandard2.0/System.Management.dll": {
-            "assemblyVersion": "4.0.0.0",
-            "fileVersion": "5.0.20.51904"
-          }
-        },
-        "runtimeTargets": {
-          "runtimes/win/lib/netcoreapp2.0/System.Management.dll": {
-            "rid": "win",
-            "assetType": "runtime",
             "assemblyVersion": "4.0.0.0",
             "fileVersion": "5.0.20.51904"
           }

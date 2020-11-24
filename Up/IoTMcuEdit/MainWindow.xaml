@@ -7,7 +7,6 @@
         mc:Ignorable="d"
         Title="屏幕编辑" Height="359" Width="702" ResizeMode="CanMinimize" Icon="/IoTMcuEdit;component/Color_yr.ico" Closed="Window_Closed">
     <Window.Resources>
-        <local:FontSizeConverter x:Key="FontSizeConverter"/>
         <local:FontColorConverter x:Key="FontColorConverter"/>
     </Window.Resources>
     <Grid>

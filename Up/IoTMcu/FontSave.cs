@@ -1,6 +1,7 @@
 ﻿using Lib;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.IO;
 using System.Net.Sockets;
@@ -30,7 +31,6 @@ namespace IoTMcu
         }
         public void Start()
         {
-
             if (!Directory.Exists(Local))
             {
                 Directory.CreateDirectory(Local);
@@ -49,13 +49,23 @@ namespace IoTMcu
                 pfc.AddFontFile(item.FullName);
                 FontList.Add(item.Name, index);
                 FontFiles.Add(item.Name);
-
+                Logs.Log($"加载字体{item.Name}");
                 index++;
             }
-            foreach (var item in FontList.Keys)
-            {
-                Logs.Log(item);
-            }
+            test();
+        }
+
+        private void test()
+        {
+            var ShowImg = new Bitmap(16, 16);
+            Graphics Graphics = Graphics.FromImage(ShowImg);
+            Graphics.SmoothingMode = SmoothingMode.None;
+            Graphics.InterpolationMode = InterpolationMode.Low;
+            Graphics.PageUnit = GraphicsUnit.Pixel;
+            Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+            Graphics.Clear(Color.White);
+            Graphics.DrawString("测", new Font(pfc.Families[0], 15, GraphicsUnit.Pixel), Brushes.Black, 0, 0);
+            ShowImg.Save("test1.jpg");
         }
 
         public void GenShow(Graphics Graphics, ShowObj show)
@@ -64,7 +74,12 @@ namespace IoTMcu
             if (FontList.ContainsKey(show.FontType))
             {
                 Logs.Log("正在写字");
-                Graphics.DrawString(show.Text, new Font(pfc.Families[FontList[show.FontType]], show.Size),
+                Graphics.SmoothingMode = SmoothingMode.None;
+                Graphics.InterpolationMode = InterpolationMode.Low;
+                Graphics.PageUnit = GraphicsUnit.Pixel;
+                Graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+                Graphics.DrawString(show.Text, new Font(pfc.Families[FontList[show.FontType]], 
+                    show.Size, GraphicsUnit.Point),
                     FontData.BrushesSave[show.Color], show.X, show.Y);
             }
         }
