@@ -72,8 +72,8 @@ namespace IoTMcuEdit
                 }
             }
             catch
-            { 
-                
+            {
+
             }
         }
         public async void SetConnect(string ip, int port)
@@ -87,7 +87,7 @@ namespace IoTMcuEdit
             {
                 try
                 {
-                    if(socket == null)
+                    if (socket == null)
                         socket = new(SocketType.Stream, ProtocolType.Tcp);
                     socket.Connect(ip, port);
                     var LastPackObj = new SocketObject

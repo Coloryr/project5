@@ -1,10 +1,10 @@
 ﻿using Lib;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using Newtonsoft.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -179,9 +179,9 @@ namespace IoTMcuEdit
                 }
                 else
                 {
-                    foreach(var item in DownloadTasks)
+                    foreach (var item in DownloadTasks)
                     {
-                        item.Value.Close();    
+                        item.Value.Close();
                     }
                     DownloadTasks.Clear();
                     lock1.IsEnabled =

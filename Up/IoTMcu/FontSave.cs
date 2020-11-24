@@ -20,51 +20,52 @@ namespace IoTMcu
     {
         public static readonly string Local = IoTMcuMain.Local + "Font/";
 
-        public readonly Dictionary<string, Font> FontList = new();
+        private readonly Dictionary<string, int> FontList = new();
+        private PrivateFontCollection pfc = new();
+
+        public readonly List<string> FontFiles = new();
         public FontSave()
         {
             Start();
         }
         public void Start()
         {
-            PrivateFontCollection pfc = new();
+
             if (!Directory.Exists(Local))
             {
                 Directory.CreateDirectory(Local);
             }
             var list = new DirectoryInfo(Local);
             int index = 0;
-            if (FontList.Count != 0)
+            if (pfc != null)
             {
-                foreach (var item in FontList.Values)
-                {
-                    item.Dispose();
-                }
+                pfc.Dispose();
             }
+            pfc = new();
             FontList.Clear();
+            FontFiles.Clear();
             foreach (var item in list.GetFiles())
             {
                 pfc.AddFontFile(item.FullName);
-                Font f12 = new Font(pfc.Families[index], 12);
-                Font f16 = new Font(pfc.Families[index], 16);
-                Font f24 = new Font(pfc.Families[index], 24);
-                Font f32 = new Font(pfc.Families[index], 32);
-
-                FontList.Add(item.Name + "12", f12);
-                FontList.Add(item.Name + "16", f16);
-                FontList.Add(item.Name + "24", f24);
-                FontList.Add(item.Name + "32", f32);
+                FontList.Add(item.Name, index);
+                FontFiles.Add(item.Name);
 
                 index++;
             }
-            pfc.Dispose();
+            foreach (var item in FontList.Keys)
+            {
+                Logs.Log(item);
+            }
         }
 
-        public void GenShow(Graphics Graphics, string data, string FontName, int x, int y, FontSelfSize size, FontSelfColor color)
+        public void GenShow(Graphics Graphics, ShowObj show)
         {
-            if (FontList.ContainsKey(FontName + size))
+            Logs.Log(show.FontType);
+            if (FontList.ContainsKey(show.FontType))
             {
-                Graphics.DrawString(data, FontList[FontName + size], FontData.BrushesSave[color], new PointF(x, y));
+                Logs.Log("正在写字");
+                Graphics.DrawString(show.Text, new Font(pfc.Families[FontList[show.FontType]], show.Size),
+                    FontData.BrushesSave[show.Color], show.X, show.Y);
             }
         }
 
@@ -72,7 +73,7 @@ namespace IoTMcu
         {
             if (FontList.ContainsKey(data))
             {
-                FontList[data].Dispose();
+                pfc.Families[FontList[data]].Dispose();
                 FontList.Remove(data);
                 SocketIoT.SendNext(new IoTPackObj
                 {

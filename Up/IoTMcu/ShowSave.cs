@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Device.Gpio;
 using System.Drawing;
 using System.IO;
 using System.Text.Json;
@@ -69,17 +67,26 @@ namespace IoTMcu
                 }
                 else
                 {
-                    var show = ShowList[showindex];
                     if (updata)
                     {
+                        if (showindex >= ShowList.Count)
+                            showindex = 0;
+                        var show = ShowList[showindex];
                         ClearShow();
-
                         //画汉字
-
+                        IoTMcuMain.Font.GenShow(Graphics, show);
+                        showdelay = show.Time;
                         UpdateShow();
                         updata = false;
+                        ShowImg.Save("test.jpg");
                     }
                     Thread.Sleep(100);
+                    showdelay -= 100;
+                    if (showdelay <= 0)
+                    {
+                        updata = true;
+                        showindex++;
+                    }
                 }
             }
         }
@@ -117,6 +124,7 @@ namespace IoTMcu
                     }
                     else
                     {
+                        Console.WriteLine(temp.ToString());
                         ShowData[bit + i * XCount] |= (byte)(1 << bit_);
                         ShowData[bit + BULLocal + i * XCount] |= (byte)(1 << bit_);
                     }
@@ -176,6 +184,10 @@ namespace IoTMcu
             }
             ShowImg = new Bitmap(IoTMcuMain.Config.Width, IoTMcuMain.Config.Height);
             Graphics = Graphics.FromImage(ShowImg);
+            Graphics.SmoothingMode = SmoothingMode.None;
+            Graphics.InterpolationMode = InterpolationMode.Low;
+            Graphics.PageUnit = GraphicsUnit.Pixel;
+            Graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
 
             ClearShow();
 

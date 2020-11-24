@@ -10,7 +10,7 @@ namespace IoTMcuEdit
         private int _X = 0;
         private int _Y = 0;
         private int _Time = 1000;
-        private FontSelfSize _Size = FontSelfSize.px12;
+        private int _Size = 16;
         private FontSelfColor _Color = FontSelfColor.RED;
         private string _FontType;
         private string _Text = "测试";
@@ -60,7 +60,7 @@ namespace IoTMcuEdit
                 return _Time;
             }
         }
-        public FontSelfSize Size
+        public int Size
         {
             set
             {

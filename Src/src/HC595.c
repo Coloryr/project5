@@ -62,10 +62,27 @@ void SetDataA(uint8_t *data1, uint8_t *data2, uint8_t size)
         for (i = 0; i < 8; i++)
         {
             gpio_set_level(MCLK, 0);
-            // gpio_set_level(M1BLU, 0);
-            // gpio_set_level(M1RED, 1);
-            gpio_set_level(M1RED, data_1 & 0x80 ? 1 : 0);
-            gpio_set_level(M1BLU, data_2 & 0x80 ? 1 : 0);
+            gpio_set_level(M1BLU, 0);
+            gpio_set_level(M1RED, 1);
+            // gpio_set_level(M1RED, data_1 & 0x80 ? 1 : 0);
+            // gpio_set_level(M1BLU, data_2 & 0x80 ? 1 : 0);
+            // if (data_1 & 0x80)
+            // {
+            //     gpio_set_level(M1RED, 1);
+            // }
+            // else
+            // {
+            //     gpio_set_level(M1RED, 0);
+            // }
+
+            // if (data_2 & 0x80)
+            // {
+            //     gpio_set_level(M1BLU, 1);
+            // }
+            // else
+            // {
+            //     gpio_set_level(M1BLU, 0);
+            // }
 
             data_1 <<= 1;
             data_2 <<= 1;

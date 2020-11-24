@@ -1,9 +1,9 @@
 ﻿using Lib;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
 
@@ -92,7 +92,6 @@ namespace IoTMcu
                     {
                         string temp = Encoding.UTF8.GetString(state.buffer);
                         temp = temp[5..];
-                        Console.WriteLine(temp);
                         var obj = JsonConvert.DeserializeObject<IoTPackObj>(temp);
                         var pack = new IoTPackObj();
 
@@ -101,7 +100,6 @@ namespace IoTMcu
                             case PackType.AddFont:
                                 if (DownloadTasks.ContainsKey(obj.Data))
                                 {
-                                    Logs.Log($"收到字体{obj.Data}数据包");
                                     var data = Convert.FromBase64String(obj.Data1);
                                     DownloadTasks[obj.Data].Write(data);
                                 }
@@ -137,7 +135,7 @@ namespace IoTMcu
                                 pack.Data = IoTMcuMain.Config.Name;
                                 pack.Data3 = IoTMcuMain.Config.Width;
                                 pack.Data4 = IoTMcuMain.Config.Height;
-                                var list = IoTMcuMain.Font.FontList.Keys;
+                                var list = IoTMcuMain.Font.FontFiles;
                                 var list1 = IoTMcuMain.Show.ShowList.Values;
                                 pack.Data1 = JsonConvert.SerializeObject(list);
                                 pack.Data2 = JsonConvert.SerializeObject(list1);
@@ -154,7 +152,7 @@ namespace IoTMcu
                                 break;
                             case PackType.ListFont:
                                 pack.Type = PackType.ListFont;
-                                list = IoTMcuMain.Font.FontList.Keys;
+                                list = IoTMcuMain.Font.FontFiles;
                                 pack.Data = JsonConvert.SerializeObject(list);
                                 SendNext(pack, ThisSocket);
                                 break;
@@ -264,7 +262,7 @@ namespace IoTMcu
                 ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 ServerSocket.Connect(localEndPoint);
                 var ServerPackObj = new SocketObject
-                { 
+                {
                     workSocket = ServerSocket
                 };
                 ServerSocket.BeginReceive(ServerPackObj.buffer, 0, SocketObject.BufferSize,

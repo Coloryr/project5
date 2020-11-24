@@ -50,10 +50,10 @@ namespace IoTMcu
             UartUtils = new();
             Logs.Log("Start Socket");
             SocketIoT = new();
-            Logs.Log("Start Show");
-            Show = new();
             Logs.Log("Start Font");
             Font = new();
+            Logs.Log("Start Show");
+            Show = new();
             Logs.Log("Start!!!");
         }
     }

@@ -8,23 +8,10 @@
 #include "HC138.h"
 #include "HC595.h"
 
-void test()
-{
-    for (uint8_t i = 0; i < Height; i++)
-    {
-        for (uint8_t j = 0; j < Width; j++)
-        {
-            REDData[i][j] = 0x00;
-            BULData[i][j] = 0xff;
-        }
-    }
-}
-
 void TaskShow(void *data)
 {
     uint8_t y;
     printf("开始显示\n");
-    test();
     SetEnable(0);
     for (;;)
     {
@@ -47,13 +34,12 @@ void TaskShow(void *data)
                 UnLock();
                 // SetEnable(1);
                 // esp_task_wdt_reset();
-                vTaskDelay(5 / portTICK_PERIOD_MS);
+                vTaskDelay(4 / portTICK_PERIOD_MS);
             }
         }
         else
         {
             SetEnable(1);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace IoTMcuEdit
         private int size;
         private int now = 0;
         private int down = 0;
+        private const int PackSize = 800;
 
         public SocketUtils SocketUtils;
         public string name;
@@ -40,10 +41,10 @@ namespace IoTMcuEdit
         {
             WriteLock.WaitOne();
             WriteLock.Reset();
-            var data = new byte[800];
-            if (size > 800)
+            var data = new byte[PackSize];
+            if (size > PackSize)
             {
-                down = 800;
+                down = PackSize;
             }
             else
             {
@@ -58,7 +59,7 @@ namespace IoTMcuEdit
                 App.MainWindow_.TaskDone(name);
             }
             size -= down;
-            now += 800;
+            now += PackSize;
             WriteLock.Set();
         }
 

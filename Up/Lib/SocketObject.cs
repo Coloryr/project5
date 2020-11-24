@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
+﻿using System.Net.Sockets;
 
 namespace Lib
 {
     class SocketObject
     {
         public Socket workSocket = null;
-        public const int BufferSize = 65535;
+        public const int BufferSize = 12287;
         public byte[] buffer = new byte[BufferSize];
     }
 }

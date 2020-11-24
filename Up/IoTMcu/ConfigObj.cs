@@ -25,7 +25,7 @@ namespace IoTMcu
         public int Index { get; set; }
         //public ShowType Type { get; set; }
         public string FontType { get; set; }
-        public FontSelfSize Size { get; set; }
+        public int Size { get; set; }
         public FontSelfColor Color { get; set; }
         public int X { get; set; }
         public int Y { get; set; }

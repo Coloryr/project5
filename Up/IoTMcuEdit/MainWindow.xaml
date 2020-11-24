@@ -102,16 +102,7 @@
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="284,4,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Time}"
                          VerticalAlignment="Top" Width="59"/>
                 <Label Content="大小" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0"/>
-                <Grid HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="79" Margin="34,28,0,0">
-                    <RadioButton Content="12" Style="{DynamicResource RadioButton_Left}" Margin="0,0,59,0" Name="px12"
-                                 IsChecked="{Binding Path=TempShowObj.Size,Converter={StaticResource FontSizeConverter},ConverterParameter=0}" />
-                    <RadioButton Content="16" Style="{DynamicResource RadioButton_Middle}" Margin="20,0,39,0" Name="px16"
-                                 IsChecked="{Binding Path=TempShowObj.Size,Converter={StaticResource FontSizeConverter},ConverterParameter=1}" />
-                    <RadioButton Content="24" Style="{DynamicResource RadioButton_Middle}" Margin="39,0,20,0" Name="px24"
-                                 IsChecked="{Binding Path=TempShowObj.Size,Converter={StaticResource FontSizeConverter},ConverterParameter=2}" />
-                    <RadioButton Content="32" Style="{DynamicResource RadioButton_Right}" Margin="59,0,0,0" Name="px32"
-                                 IsChecked="{Binding Path=TempShowObj.Size,Converter={StaticResource FontSizeConverter},ConverterParameter=3}" />
-                </Grid>
+
                 <Label Content="字体样式" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="261,0,0,0"/>
                 <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="118" Margin="319,0,0,0"
                           Height="20" IsReadOnly="True" Name="字体样式" SelectionChanged="字体样式_SelectionChanged"/>
@@ -124,6 +115,8 @@
                     <RadioButton Content="B" Style="{DynamicResource RadioButton_Middle}" IsChecked="{Binding Path=TempShowObj.Color,Converter={StaticResource FontColorConverter},ConverterParameter=1}" Margin="20,0,39,0"/>
                     <RadioButton Content="C" Style="{DynamicResource RadioButton_Right}" IsChecked="{Binding Path=TempShowObj.Color,Converter={StaticResource FontColorConverter},ConverterParameter=2}" Margin="40,0,19,0"/>
                 </Grid>
+                <TextBox HorizontalAlignment="Left" Height="18" Margin="34,0,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Size}"
+                         VerticalAlignment="Center" Width="40"/>
             </Grid>
         </GroupBox>
 

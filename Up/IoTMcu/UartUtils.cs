@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Lib;
 using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using Lib;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace IoTMcu
 {
@@ -26,12 +21,12 @@ namespace IoTMcu
         private void Read()
         {
             while (IsRun)
-            { 
-                if(serialPort.BytesToRead > 0)
+            {
+                if (serialPort.BytesToRead > 0)
                 {
                     var data = new byte[serialPort.BytesToRead];
                     serialPort.Read(data, 0, data.Length);
-                    if(SocketIoT.Check(data))
+                    if (SocketIoT.Check(data))
                     {
                         switch (data[5])
                         {
@@ -60,7 +55,7 @@ namespace IoTMcu
             {
                 Logs.Log("数据包过短");
             }
-            else 
+            else
             {
                 for (int i = 0; i < 5; i++)
                 {
