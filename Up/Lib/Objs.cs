@@ -6,6 +6,6 @@
     }
     public enum ShowType
     {
-        Normal,
+        Normal, Pic
     }
 }

@@ -29,5 +29,19 @@ namespace IoTMcuEdit
 
             return ShowImg;
         }
+
+        public static Bitmap Gen(ShowObj show, LcdObj lcd, Bitmap img)
+        {
+            Bitmap ShowImg = new(lcd.X, lcd.Y);
+            Graphics graphics = Graphics.FromImage(ShowImg);
+            graphics.SmoothingMode = SmoothingMode.None;
+            graphics.InterpolationMode = InterpolationMode.Low;
+            graphics.PageUnit = GraphicsUnit.Pixel;
+            graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+            graphics.Clear(Color.White);
+
+            graphics.DrawImage(img, show.X, show.Y);
+            return ShowImg;
+        }
     }
 }

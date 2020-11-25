@@ -73,7 +73,7 @@ namespace IoTMcu
                         showdelay = show.Time;
                         ShowImg = ShowDataList[show];
                         UpdateShow();
-                        IoTMcuMain.UartUtils.Write(ShowData);
+                        IoTMcuMain.UartUtils.Write(ShowData, 0x02);
                         updata = false;
                     }
                     Thread.Sleep(100);
@@ -103,8 +103,8 @@ namespace IoTMcu
                     }
                     else if (temp == Blue)
                     {
-                        RedBitArray[i * IoTMcuMain.Config.Width + j] = false;
-                        BulBitArray[i * IoTMcuMain.Config.Width + j] = true;
+                        RedBitArray[i * IoTMcuMain.Config.Width + j] = true;
+                        BulBitArray[i * IoTMcuMain.Config.Width + j] = false;
                     }
                     else if (temp == Mix)
                     {
@@ -235,12 +235,12 @@ namespace IoTMcu
 
             BULLocal = IoTMcuMain.Config.Height * IoTMcuMain.Config.Width;
 
-            var data = new byte[8];
-            UartUtils.BuildPack(data);
-            data[5] = 0x01;
-            data[6] = (byte)IoTMcuMain.Config.Height;
-            data[7] = (byte)IoTMcuMain.Config.Width;
-            IoTMcuMain.UartUtils.Write(data);
+            Logs.Log("设置屏幕");
+
+            var data = new byte[2];
+            data[0] = (byte)IoTMcuMain.Config.Height;
+            data[1] = (byte)IoTMcuMain.Config.Width;
+            IoTMcuMain.UartUtils.Write(data, 0x01);
             updata = true;
         }
     }

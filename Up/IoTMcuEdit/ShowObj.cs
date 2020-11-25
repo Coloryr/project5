@@ -116,6 +116,8 @@ namespace IoTMcuEdit
             }
         }
 
+        public ShowType Type { get; set; }
+
         public void Bind(ShowObj obj)
         {
             obj.Color = Color;
@@ -127,6 +129,7 @@ namespace IoTMcuEdit
             obj.Text = Text;
             obj.Index = Index;
             obj.Size = Size;
+            obj.Type = Type;
         }
 
         private void UpdateProperty<T>(ref T properValue, T newValue, [CallerMemberName] string propertyName = "")

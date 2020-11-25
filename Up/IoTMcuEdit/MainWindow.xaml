@@ -86,7 +86,7 @@
                 <Label Content="字体样式" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="74,25,0,0"/>
                 <Label Content="显示内容" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,50,0,0"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="58,54,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Text}"
-                         VerticalAlignment="Top" Width="300"/>
+                         VerticalAlignment="Top" Width="221"/>
                 <Label Content="颜色" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="343,0,0,0"/>
                 <Grid HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="79" Margin="377,4,0,0">
                     <RadioButton Content="A" Style="{DynamicResource RadioButton_Left}" IsChecked="{Binding Path=TempShowObj.Color,Converter={StaticResource FontColorConverter},ConverterParameter=0}" Margin="0,0,59,0"/>
@@ -97,9 +97,10 @@
                          VerticalAlignment="Top" Width="40"/>
                 <Button Content="选择字体" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="284,29,0,0" Height="18" Click="Font_Click"/>
                 <Image Margin="4,76,4,4" Name="ImgTest" Stretch="None"/>
-                <Button Content="刷新显示" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="363,29,0,0" Height="18" Click="ShowRe_Click"/>
+                <Button Content="刷新字体" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="284,54,0,0" Height="18" Click="ShowRe_Click"/>
                 <TextBox HorizontalAlignment="Left" Height="18" Margin="284,4,0,0" TextWrapping="Wrap" Text="{Binding TempShowObj.Time}"
                          VerticalAlignment="Top" Width="59"/>
+                <Button Content="选择图片" HorizontalAlignment="Left" VerticalAlignment="Top" Width="74" Margin="363,29,0,0" Height="18" Click="Pic_Click"/>
             </Grid>
         </GroupBox>
 

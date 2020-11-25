@@ -3,11 +3,13 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace IoTMcuEdit
 {
@@ -19,8 +21,10 @@ namespace IoTMcuEdit
         public System.Windows.Forms.NotifyIcon notifyIcon;
         private SocketUtils SocketUtils;
         private int index;
+        private string local = AppDomain.CurrentDomain.BaseDirectory + "TEMP/";
 
         private Dictionary<string, DownloadFile> DownloadTasks = new();
+        private Dictionary<int, Bitmap> Imgs = new();
         public ObservableCollection<ShowObj> ShowList { get; set; } = new();
         public ShowObj TempShowObj { get; set; } = new();
         public LcdObj LcdObj { get; set; } = new()
@@ -192,6 +196,26 @@ namespace IoTMcuEdit
             index = 显示列表.SelectedIndex;
             var data = (ShowObj)显示列表.SelectedItem;
             data.Bind(TempShowObj);
+            Bitmap img = null;
+            if (Imgs.ContainsKey(TempShowObj.Index))
+            {
+                Imgs[TempShowObj.Index].Dispose();
+                img = Imgs[TempShowObj.Index];
+            }
+            else if(TempShowObj.Type == ShowType.Normal)
+            {
+                img = GenShow.Gen(TempShowObj, LcdObj);
+                Imgs.Add(TempShowObj.Index, img);
+            }
+            if (img != null)
+            {
+                ImageSource wpfBitmap = Imaging.CreateBitmapSourceFromHBitmap(
+                   img.GetHbitmap(),
+                   IntPtr.Zero,
+                   Int32Rect.Empty,
+                   BitmapSizeOptions.FromEmptyOptions());
+                ImgTest.Source = wpfBitmap;
+            }
             App.ShowA(data.Name, "正在修改");
         }
         private void DeleteShow(object sender, RoutedEventArgs e)
@@ -243,6 +267,19 @@ namespace IoTMcuEdit
         }
         private void Setting_Click(object sender, RoutedEventArgs e)
         {
+            if (TempShowObj.Type == ShowType.Normal)
+            {
+                var img = GenShow.Gen(TempShowObj, LcdObj);
+                if (Imgs.ContainsKey(TempShowObj.Index))
+                {
+                    Imgs[TempShowObj.Index].Dispose();
+                    Imgs[TempShowObj.Index] = img;
+                }
+                else
+                {
+                    Imgs.Add(TempShowObj.Index, img);
+                }
+            }
             TempShowObj.Bind(ShowList[index]);
             App.ShowA(TempShowObj.Name, "设置成功");
         }
@@ -293,7 +330,6 @@ namespace IoTMcuEdit
 
         private void SetShow_Click(object sender, RoutedEventArgs e)
         {
-            var local = AppDomain.CurrentDomain.BaseDirectory + "TEMP/";
             if (!Directory.Exists(local))
             {
                 Directory.CreateDirectory(local);
@@ -302,10 +338,9 @@ namespace IoTMcuEdit
             {
                 File.Delete(item);
             }
-            foreach (var item in ShowList)
+            foreach (var item in Imgs)
             {
-                var img = GenShow.Gen(TempShowObj, LcdObj);
-                img.Save(local + item.Index + ".jpg");
+                item.Value.Save(local + item.Key + ".jpg");
             }
             var packup = new PackUp();
             var temp = packup.ZipDirectory(local, local + "pack.zip");
@@ -326,6 +361,16 @@ namespace IoTMcuEdit
         private void ShowRe_Click(object sender, RoutedEventArgs e)
         {
             var img = GenShow.Gen(TempShowObj, LcdObj);
+            if (Imgs.ContainsKey(TempShowObj.Index))
+            {
+                Imgs[TempShowObj.Index].Dispose();
+                Imgs[TempShowObj.Index] = img;
+            }
+            else
+            {
+                Imgs.Add(TempShowObj.Index, img);
+            }
+            TempShowObj.Type = ShowType.Normal;
             ImageSource wpfBitmap = Imaging.CreateBitmapSourceFromHBitmap(
                img.GetHbitmap(),
                 IntPtr.Zero,
@@ -341,6 +386,44 @@ namespace IoTMcuEdit
             {
                 TempShowObj.FontType = fontDialog.Font.FontFamily.Name;
                 TempShowObj.Size = (int)fontDialog.Font.Size;
+            }
+        }
+
+        private void Pic_Click(object sender, RoutedEventArgs eve)
+        {
+            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            openFileDialog1.Title = "选择图片";
+            openFileDialog1.Filter = "图片|*.jpg;*.png;*.jpeg;*.bmp";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                try
+                {
+                    Bitmap bitmap = new(openFileDialog1.FileName);
+                    var img = GenShow.Gen(TempShowObj, LcdObj, bitmap);
+                    if (Imgs.ContainsKey(TempShowObj.Index))
+                    {
+                        Imgs[TempShowObj.Index].Dispose();
+                        Imgs[TempShowObj.Index] = img;
+                    }
+                    else
+                    {
+                        Imgs.Add(TempShowObj.Index, img);
+                    }
+                    TempShowObj.Type = ShowType.Pic;
+                    TempShowObj.Text = "";
+                    ImageSource wpfBitmap = Imaging.CreateBitmapSourceFromHBitmap(
+                    img.GetHbitmap(),
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+                    ImgTest.Source = wpfBitmap;
+                }
+                catch (Exception e)
+                {
+                    App.ShowB("打开图片失败", e.ToString());
+                }
             }
         }
     }

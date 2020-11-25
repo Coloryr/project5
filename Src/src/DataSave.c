@@ -26,9 +26,10 @@ void DataInit()
 
 void FreeShow()
 {
-    printf("释放完毕\n");
+    
     if (REDData != NULL)
     {
+        printf("释放红\n");
         for (uint8_t i = 0; i < Height; ++i)
         {
             free(REDData[i]);
@@ -37,12 +38,14 @@ void FreeShow()
     }
     if (BULData != NULL)
     {
+         printf("释放蓝\n");
         for (uint8_t i = 0; i < Height; ++i)
         {
             free(BULData[i]);
         }
         free(BULData);
     }
+    printf("释放完毕\n");
 }
 
 void InitShow()
@@ -52,7 +55,7 @@ void InitShow()
     REDData = (uint8_t **)malloc(Height * sizeof(uint8_t *));
     BULData = (uint8_t **)malloc(Height * sizeof(uint8_t *));
 
-    for (uint8_t i = 1; i < Height; ++i)
+    for (uint8_t i = 0; i < Height; ++i)
     {
         REDData[i] = (uint8_t *)malloc(Width * sizeof(uint8_t));
         BULData[i] = (uint8_t *)malloc(Width * sizeof(uint8_t));

@@ -67,11 +67,11 @@ namespace IoTMcu
             }
         }
 
-        public void Write(byte[] data)
+        public void Write(byte[] data, byte mode)
         {
             var temp = new byte[data.Length + 6];
             BuildPack(temp);
-            temp[5] = 0x02;
+            temp[5] = mode;
             Array.Copy(data, 0, temp, 6, data.Length);
             if (serialPort.IsOpen)
                 serialPort.Write(temp, 0, temp.Length);
