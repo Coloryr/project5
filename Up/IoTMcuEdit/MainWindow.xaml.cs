@@ -79,7 +79,7 @@ namespace IoTMcuEdit
             StateLable.Content = "未连接";
             StateLed.Fill = Brushes.Red;
 
-            //SocketState(true);
+            SocketState(true);
         }
         public void TaskDone(string name)
         {
